@@ -10,6 +10,7 @@
   <properties>
     <java.version>23</java.version>
     <sqlite-jdbc.version>3.47.2.0</sqlite-jdbc.version>
+    <liquibase.version>4.30.0</liquibase.version>
     <junit.version>5.11.4</junit.version>
   </properties>
 
@@ -20,7 +21,7 @@
       <artifactId>mdjs</artifactId>
       <version>1.0</version>
       <scope>system</scope>
-      <systemPath>${project.basedir}/lib/mdsj.jar</systemPath>
+      <systemPath>${pom.basedir}/lib/mdsj.jar</systemPath>
     </dependency>
 
     <!-- DATABASE -->
@@ -30,6 +31,13 @@
       <version>${sqlite-jdbc.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${liquibase.version}</version>
+    </dependency>
+
+
     <!-- TESTING -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -38,4 +46,18 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-maven-plugin</artifactId>
+        <version>${liquibase.version}</version>
+        <configuration>
+          <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
