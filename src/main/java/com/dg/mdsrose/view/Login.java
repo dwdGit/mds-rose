@@ -1,4 +1,4 @@
-package com.dg.mdsrose.view.panel;
+package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.user.User;
 import com.dg.mdsrose.user.UserService;
@@ -16,26 +16,43 @@ public class Login extends JFrame implements ActionListener {
     private JPasswordField passwordField;
     private JLabel usernameLabel;
     private JLabel passwordLabel;
+    private JButton goToSignupButton;
+
+    private final UserService userService = UserService.getInstance();
 
     public Login() {
         this.setTitle("Login");
         this.setContentPane(loginPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
         loginButton.addActionListener(this);
+        goToSignupButton.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        UserService instance = UserService.getInstance();
-        Optional<User> login = instance.login(usernameField.getText(), new String(passwordField.getPassword()));
+        if(e.getSource().equals(loginButton)) {
+            login();
+        } else if(e.getSource().equals(goToSignupButton)) {
+            goToSignup();
+        }
+    }
+
+    private void login() {
+        Optional<User> login = userService.login(usernameField.getText(), new String(passwordField.getPassword()));
         if (login.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         User user = login.get();
         System.out.println(user);
+    }
+
+    private void goToSignup() {
+        new Signup();
+        this.dispose();
     }
 
     {

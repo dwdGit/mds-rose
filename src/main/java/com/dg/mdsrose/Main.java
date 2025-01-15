@@ -1,7 +1,6 @@
 package com.dg.mdsrose;
 
-import com.dg.mdsrose.view.panel.Signup;
-import com.dg.mdsrose.view.panel.Login;
+import com.dg.mdsrose.view.Login;
 
 import javax.swing.*;
 

@@ -3,10 +3,14 @@ package com.dg.mdsrose.enums;
 public enum DBTable {
     USER("user");
 
-    public final String value;
+    private final String value;
 
-    private DBTable(String value) {
+    DBTable(String value) {
         this.value = value;
+    }
+
+    public String getValue() {
+        return this.value;
     }
 }
 

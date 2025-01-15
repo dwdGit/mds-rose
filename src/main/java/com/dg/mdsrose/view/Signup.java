@@ -1,5 +1,6 @@
-package com.dg.mdsrose.view.panel;
+package com.dg.mdsrose.view;
 
+import com.dg.mdsrose.exception.UserAlreadyExistsException;
 import com.dg.mdsrose.user.UserService;
 
 import javax.swing.*;
@@ -21,11 +22,14 @@ public class Signup extends JFrame implements ActionListener {
     private JLabel passwordLabel;
     private JLabel confirmPasswordLabel;
 
+    private final UserService userService = UserService.getInstance();
+
     public Signup() {
         this.setTitle("Signup");
         this.setContentPane(signupPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
         this.signUpButton.addActionListener(this);
     }
@@ -38,11 +42,20 @@ public class Signup extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(null, "Passwords do not match","Signup", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        UserService userService = UserService.getInstance();
-        userService.signup(usernameField.getText(), password,firstnameField.getText(), lastnameField.getText());
+        if (!signup(password)) return;
         JOptionPane.showMessageDialog(null, "Signed up successfully", "Signup", JOptionPane.INFORMATION_MESSAGE);
         new Login();
         this.dispose();
+    }
+
+    private boolean signup(String password) {
+        try {
+            userService.signup(usernameField.getText(), password,firstnameField.getText(), lastnameField.getText());
+            return true;
+        } catch (UserAlreadyExistsException ex) {
+            JOptionPane.showMessageDialog(null, "User already exists!","Signup", JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
     }
 
     {
