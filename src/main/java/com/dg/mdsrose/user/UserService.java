@@ -34,7 +34,7 @@ public class UserService {
         if(userDAO.existsByUsername(username)){
             throw new UserAlreadyExistsException(username);
         }
-        User userToInsert = new User(username, password, firstname, lastname);
+        User userToInsert = new User(username, BCrypt.hashpw(password, BCrypt.gensalt()), firstname, lastname);
         userDAO.insert(userToInsert);
     }
 }

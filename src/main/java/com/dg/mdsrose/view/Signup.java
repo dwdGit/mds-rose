@@ -39,7 +39,7 @@ public class Signup extends JFrame implements ActionListener {
         String password = new String(passwordField.getPassword());
         String confirmPassword = new String(confirmPasswordField.getPassword());
         if (!password.equals(confirmPassword)) {
-            JOptionPane.showMessageDialog(null, "Passwords do not match","Signup", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Passwords do not match", "Signup", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!signup(password)) return;
@@ -50,10 +50,10 @@ public class Signup extends JFrame implements ActionListener {
 
     private boolean signup(String password) {
         try {
-            userService.signup(usernameField.getText(), password,firstnameField.getText(), lastnameField.getText());
+            userService.signup(usernameField.getText(), password, firstnameField.getText(), lastnameField.getText());
             return true;
         } catch (UserAlreadyExistsException ex) {
-            JOptionPane.showMessageDialog(null, "User already exists!","Signup", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "User already exists!", "Signup", JOptionPane.ERROR_MESSAGE);
         }
         return false;
     }

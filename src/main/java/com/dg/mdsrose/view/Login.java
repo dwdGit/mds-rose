@@ -2,6 +2,7 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.user.User;
 import com.dg.mdsrose.user.UserService;
+import com.dg.mdsrose.user.UserSession;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +20,7 @@ public class Login extends JFrame implements ActionListener {
     private JButton goToSignupButton;
 
     private final UserService userService = UserService.getInstance();
+    private final UserSession userSession = UserSession.getInstance();
 
     public Login() {
         this.setTitle("Login");
@@ -33,9 +35,9 @@ public class Login extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource().equals(loginButton)) {
+        if (e.getSource().equals(loginButton)) {
             login();
-        } else if(e.getSource().equals(goToSignupButton)) {
+        } else if (e.getSource().equals(goToSignupButton)) {
             goToSignup();
         }
     }
@@ -43,11 +45,19 @@ public class Login extends JFrame implements ActionListener {
     private void login() {
         Optional<User> login = userService.login(usernameField.getText(), new String(passwordField.getPassword()));
         if (login.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Invalid username or password", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Invalid username or password",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
             return;
         }
         User user = login.get();
-        System.out.println(user);
+        userSession.init(user);
+
+        new Homepage();
+        this.dispose();
     }
 
     private void goToSignup() {
@@ -71,9 +81,9 @@ public class Login extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         loginPanel = new JPanel();
-        loginPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
+        loginPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 3, new Insets(10, 10, 10, 10), -1, -1));
         loginPanel.setMinimumSize(new Dimension(385, 136));
-        loginPanel.setPreferredSize(new Dimension(340, 180));
+        loginPanel.setPreferredSize(new Dimension(385, 136));
         usernameLabel = new JLabel();
         usernameLabel.setText("Username");
         loginPanel.add(usernameLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -87,6 +97,9 @@ public class Login extends JFrame implements ActionListener {
         loginButton = new JButton();
         loginButton.setText("Login");
         loginPanel.add(loginButton, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        goToSignupButton = new JButton();
+        goToSignupButton.setText("Signup");
+        loginPanel.add(goToSignupButton, new com.intellij.uiDesigner.core.GridConstraints(2, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

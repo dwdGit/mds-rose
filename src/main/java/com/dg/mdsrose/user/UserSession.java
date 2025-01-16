@@ -34,4 +34,9 @@ public class UserSession {
         userId = null;
         username = null;
     }
+
+    public void init(User user) {
+        userId = user.getId();
+        username = user.getUsername();
+    }
 }
