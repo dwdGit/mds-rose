@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +29,6 @@ public class DataFileProcessor extends FileProcessor {
     public ExtractedDatasetData extractDatasetContent(List<String> lines) {
         List<PartialDatasetRow> pDataRows = new ArrayList<>();
         List<String> classes = new ArrayList<>();
-        List<List<Double>> dataset = new ArrayList<>(lines.size());
-
 
         for(String line : lines) {
             // split the row by comma to get all values
@@ -58,15 +55,10 @@ public class DataFileProcessor extends FileProcessor {
                     data[dataIdx++] = Double.parseDouble(columns[i]);
                 }
             }
-            dataset.add(
-                Arrays.stream(data)
-                    .boxed()
-                    .toList()
-            );
             pDataRows.add(new PartialDatasetRow(className, data));
         }
 
-        return new ExtractedDatasetData(pDataRows, classes, dataset);
+        return new ExtractedDatasetData(pDataRows, classes);
     }
 
     @Override

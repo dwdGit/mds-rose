@@ -1,13 +1,12 @@
 package com.dg.mdsrose.project.processor;
 
-/*
-* Template pattern implementation to process files
-* */
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/*
+ * Template pattern implementation to process dataset files
+ * */
 public abstract class FileProcessor {
     String fileName;
     Map<Integer, String> columnsToPick;

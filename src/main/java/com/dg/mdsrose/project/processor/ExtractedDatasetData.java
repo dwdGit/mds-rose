@@ -2,4 +2,7 @@ package com.dg.mdsrose.project.processor;
 
 import java.util.List;
 
-public record ExtractedDatasetData(List<PartialDatasetRow> partialDatasetRows, List<String> classes, List<List<Double>> dataset) {}
+/*
+* Extracted data from dataset after first iteration, all data needed for next calculus and/or for final result
+* */
+public record ExtractedDatasetData(List<PartialDatasetRow> partialDatasetRows, List<String> classes) {}
