@@ -13,6 +13,7 @@
     <liquibase.version>4.30.0</liquibase.version>
     <mindrot.version>0.4</mindrot.version>
     <junit.version>5.11.4</junit.version>
+    <xchart.version>3.8.8</xchart.version>
     <maven.compiler.source>23</maven.compiler.source>
     <maven.compiler.target>23</maven.compiler.target>
   </properties>
@@ -33,19 +34,23 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>${sqlite-jdbc.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
       <version>${liquibase.version}</version>
     </dependency>
 
+    <!-- UTILS -->
     <dependency>
       <groupId>org.mindrot</groupId>
       <artifactId>jbcrypt</artifactId>
       <version>${mindrot.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.knowm.xchart</groupId>
+      <artifactId>xchart</artifactId>
+      <version>${xchart.version}</version>
+    </dependency>
 
     <!-- TESTING -->
     <dependency>
