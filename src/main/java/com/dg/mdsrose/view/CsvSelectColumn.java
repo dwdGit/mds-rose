@@ -79,6 +79,8 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
                 selectedColumns.put(pair.getLeft(), pair.getRight());
             }
         });
+        new SelectShapeAndColor(this.path,selectedColumns);
+        this.dispose();
     }
 
     private boolean checkIfColumnSelected() {

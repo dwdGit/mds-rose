@@ -19,8 +19,9 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JLabel columnLabel;
     private JButton generateRowButton;
     private JPanel rowPanel;
-    private Map<Integer,String> selectedColumns = new HashMap<>();
 
+    private Map<Integer,String> selectedColumns = new HashMap<>();
+    private final String path;
     private final String prefixIndexColumnInputField = "numberColumn";
     private final String prefixNameColumnInputField = "nameColumn";
     private final Integer numColumnsDataset;
@@ -37,6 +38,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         generateRowButton.addActionListener(this);
         confirmButton.addActionListener(this);
 
+        this.path = path;
         DataDataset dataDataset = new DataDataset(path);
         numColumnsDataset = dataDataset.getNumberOfColumns();
     }
@@ -81,7 +83,9 @@ public class DataSelectColumn extends JFrame implements ActionListener {
                 }
             }
         }
-        System.out.println(selectedColumns);
+
+        new SelectShapeAndColor(this.path,selectedColumns);
+        this.dispose();
     }
 
     private void checkInputField() {
