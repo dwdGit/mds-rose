@@ -1,19 +1,18 @@
 package com.dg.mdsrose.enums;
 
-import org.knowm.xchart.style.markers.Marker;
-import org.knowm.xchart.style.markers.SeriesMarkers;
+import java.awt.*;
 
 public enum Shapes {
-    SQUARE("Square", SeriesMarkers.SQUARE),
-    TRIANGLE_UP("Triangle up", SeriesMarkers.TRIANGLE_UP),
-    TRIANGLE_DOWN("Triangle down", SeriesMarkers.TRIANGLE_DOWN),
-    CIRCLE("Circle", SeriesMarkers.CIRCLE),
-    DIAMOND("Diamond", SeriesMarkers.DIAMOND),;
+    SQUARE("Square", new java.awt.geom.Rectangle2D.Double(-3, -3, 6, 6)),
+    TRIANGLE_UP("Triangle up", new java.awt.Polygon(new int[]{-5, 5, 0}, new int[]{5, 5, -5}, 3)),
+    TRIANGLE_DOWN("Triangle down", new java.awt.Polygon(new int[]{-5, 5, 0}, new int[]{-5, -5, 5}, 3)),
+    CIRCLE("Circle", new java.awt.geom.Ellipse2D.Double(-3, -3, 6, 6)),
+    DIAMOND("Diamond", new java.awt.Polygon(new int[]{-6, 0, 6, 0}, new int[]{0, 6, 0, -6}, 4)),;
 
-    private String value;
-    private Marker shape;
+    private final String value;
+    private final Shape shape;
 
-    Shapes(String value, Marker shape) {
+    Shapes(String value, Shape shape) {
         this.value = value;
         this.shape = shape;
     }
@@ -22,7 +21,7 @@ public enum Shapes {
         return value;
     }
 
-    public Marker getShape() {
+    public Shape getShape() {
         return shape;
     }
 

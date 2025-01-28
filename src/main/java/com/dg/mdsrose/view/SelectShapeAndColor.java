@@ -7,8 +7,6 @@ import com.dg.mdsrose.project.Shape;
 import com.dg.mdsrose.project.ShapeClass;
 import com.dg.mdsrose.project.processor.DataFileProcessor;
 import com.dg.mdsrose.project.processor.FileProcessorResult;
-import org.knowm.xchart.style.markers.Marker;
-import org.knowm.xchart.style.markers.SeriesMarkers;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,20 +15,21 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SelectShapeAndColor extends JFrame implements ActionListener {
     private JPanel selectShapeAndColorPanel;
     private JButton confirmButton;
     private JPanel classesPanel;
 
+
     private final String[] colors = {Colors.BLUE.getValue(), Colors.GREEN.getValue(), Colors.RED.getValue(), Colors.BLACK.getValue(), Colors.YELLOW.getValue()};
     private final String[] markers = {Shapes.CIRCLE.getValue(), Shapes.SQUARE.getValue(), Shapes.TRIANGLE_UP.getValue(), Shapes.TRIANGLE_DOWN.getValue(), Shapes.DIAMOND.getValue()};
     private final String path;
-    private Map<Integer, String> selectedColumns;
-    private List<JComboBox<String>> colorComponents;
-    private List<JComboBox<String>> markerComponents;
-    private List<JLabel> labelComponents;
+    private Map<Integer, String> selectedColumns = new HashMap<>();
+    private FileProcessorResult result;
+    private List<JComboBox<String>> colorComponents = new ArrayList<>();
+    private List<JComboBox<String>> markerComponents = new ArrayList<>();
+    private List<JLabel> labelComponents = new ArrayList<>();
     private int numClasses;
 
     SelectShapeAndColor(String path, Map<Integer, String> selectedColumns) {
@@ -51,8 +50,8 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
     private void generateDatasetClass() {
         try {
             DataFileProcessor dataFileProcessor = new DataFileProcessor(path, selectedColumns);
-            FileProcessorResult resultProcess = dataFileProcessor.process();
-            List<String> datasetClasses = resultProcess.classes();
+            result = dataFileProcessor.process();
+            List<String> datasetClasses = result.classes();
             numClasses = datasetClasses.size();
             classesPanel.setLayout(new GridLayout(numClasses, 3, 10, 10));
             for (String datasetClass : datasetClasses) {
@@ -75,22 +74,45 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == confirmButton) {
+        if (e.getSource().equals(confirmButton)) {
             confirmShapeAndColor();
         }
     }
 
     private void confirmShapeAndColor() {
-        checkFillInput();
+        boolean hasDuplicated = checkDuplicatedInputs();
+        if (hasDuplicated) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Duplicate color and marker chosen!",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
         List<ShapeClass> shapeClasses = getShapeClasses();
         List<Shape> listShape = shapeClasses.stream()
-                .map(SelectShapeAndColor::mapShape)
-                .toList();
+            .map(SelectShapeAndColor::mapShape)
+            .toList();
 
+        new ShowProject(result, listShape);
+        this.dispose();
     }
 
-    private void checkFillInput() {
-        //todo: check if all input are filled
+    private boolean checkDuplicatedInputs() {
+        for (int i = 0; i < colorComponents.size(); i++) {
+            for (int j = 0; j < colorComponents.size(); j++) {
+                if (
+                    i != j &&
+                        Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
+                        Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static Shape mapShape(ShapeClass shapeClass) {
@@ -103,7 +125,7 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
 
     private List<ShapeClass> getShapeClasses() {
         List<ShapeClass> shapeClasses = new ArrayList<>();
-        for (int i=0; i<numClasses; i++) {
+        for (int i = 0; i < numClasses; i++) {
             ShapeClass shapeClass = new ShapeClass();
             shapeClass.setColor(Objects.requireNonNull(colorComponents.get(i).getSelectedItem()).toString());
             shapeClass.setMarker(Objects.requireNonNull(markerComponents.get(i).getSelectedItem()).toString());

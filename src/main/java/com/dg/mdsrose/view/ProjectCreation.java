@@ -43,16 +43,16 @@ public class ProjectCreation extends JFrame implements ActionListener {
 
     private void confirmFile() {
         DatasetStrategy datasetStrategy;
-        if(pathDatasetField.getText().endsWith(".data")) {
+        if (pathDatasetField.getText().endsWith(".data")) {
             datasetStrategy = new DataStrategy();
-        } else if(pathDatasetField.getText().endsWith(".csv")){
+        } else if (pathDatasetField.getText().endsWith(".csv")) {
             datasetStrategy = new CsvStrategy();
         } else {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Select a valid dataset.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Select a valid dataset.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }

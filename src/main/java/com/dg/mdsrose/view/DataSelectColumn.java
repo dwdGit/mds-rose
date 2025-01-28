@@ -20,7 +20,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JButton generateRowButton;
     private JPanel rowPanel;
 
-    private Map<Integer,String> selectedColumns = new HashMap<>();
+    private Map<Integer, String> selectedColumns = new HashMap<>();
     private final String path;
     private final String prefixIndexColumnInputField = "numberColumn";
     private final String prefixNameColumnInputField = "nameColumn";
@@ -56,10 +56,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         checkInputField();
         if (!rowGenerated) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "First generate rows.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "First generate rows.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
@@ -70,13 +70,13 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         String nameColumn = null;
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if(textField.getName().startsWith(prefixIndexColumnInputField)) {
+                if (textField.getName().startsWith(prefixIndexColumnInputField)) {
                     numColumn = Integer.parseInt(textField.getText());
                 }
-                if(textField.getName().startsWith(prefixNameColumnInputField)) {
+                if (textField.getName().startsWith(prefixNameColumnInputField)) {
                     nameColumn = textField.getText();
                 }
-                if(Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
+                if (Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
                     selectedColumns.put(numColumn, nameColumn);
                     numColumn = null;
                     nameColumn = null;
@@ -84,7 +84,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
             }
         }
 
-        new SelectShapeAndColor(this.path,selectedColumns);
+        new SelectShapeAndColor(this.path, selectedColumns);
         this.dispose();
     }
 
@@ -92,31 +92,31 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         Component[] components = rowPanel.getComponents();
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if(checkInputAreEmpty(textField)){
+                if (checkInputAreEmpty(textField)) {
                     JOptionPane.showMessageDialog(
-                            this,
-                            "Fill all rows.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
+                        this,
+                        "Fill all rows.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
                     );
                     return;
                 }
                 if (checkNumericField(textField)) {
-                    if(!checkDigitInputFieldNumericColumn(textField)){
+                    if (!checkDigitInputFieldNumericColumn(textField)) {
                         JOptionPane.showMessageDialog(
-                                this,
-                                "You must enter a numeric value.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
+                            this,
+                            "You must enter a numeric value.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                         );
                         return;
                     }
-                    if(checkInputFieldMaxColumn(textField)){
+                    if (checkInputFieldMaxColumn(textField)) {
                         JOptionPane.showMessageDialog(
-                                this,
-                                "Overflow max column.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
+                            this,
+                            "Overflow max column.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                         );
                         return;
                     }
@@ -144,19 +144,19 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private void generateRow() {
         if (!validateNumberColumns()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid number.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Invalid number.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
-        if(!checkMaxNumColumn()){
+        if (!checkMaxNumColumn()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid number.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Invalid number.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
@@ -165,10 +165,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
-            numColField.setName(prefixIndexColumnInputField+i);
+            numColField.setName(prefixIndexColumnInputField + i);
             JLabel numColLabel = new JLabel(".");
             JTextField nameColField = new JTextField(0);
-            nameColField.setName(prefixNameColumnInputField+i);
+            nameColField.setName(prefixNameColumnInputField + i);
             rowPanel.add(numColField);
             rowPanel.add(numColLabel);
             rowPanel.add(nameColField);

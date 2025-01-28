@@ -19,7 +19,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
 
     private final String path;
     private Map<Integer, String> selectedColumns = new HashMap<>();
-    private List<Pair<Integer,String>> csvColumns;
+    private List<Pair<Integer, String>> csvColumns;
 
     public CsvSelectColumn(String path) {
         this.setTitle("Select Column");
@@ -38,13 +38,13 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
 
     private void populateList() {
         CsvDataset csvDataset = new CsvDataset(path);
-        Optional<List<Pair<Integer,String>>> optionalCsvColumns = csvDataset.getColumns();
-        if(optionalCsvColumns.isEmpty()) {
+        Optional<List<Pair<Integer, String>>> optionalCsvColumns = csvDataset.getColumns();
+        if (optionalCsvColumns.isEmpty()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Error read columns from dataset.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Error read columns from dataset.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
@@ -58,28 +58,28 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == confirmButton) {
+        if (e.getSource() == confirmButton) {
             confirmColumns();
         }
     }
 
     private void confirmColumns() {
-        if(checkIfColumnSelected()){
+        if (checkIfColumnSelected()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Select at least one column.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Select at least one column.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
         List<String> selectedValuesList = columnList.getSelectedValuesList();
         csvColumns.forEach(pair -> {
-            if(selectedValuesList.contains(pair.getRight())) {
+            if (selectedValuesList.contains(pair.getRight())) {
                 selectedColumns.put(pair.getLeft(), pair.getRight());
             }
         });
-        new SelectShapeAndColor(this.path,selectedColumns);
+        new SelectShapeAndColor(this.path, selectedColumns);
         this.dispose();
     }
 
