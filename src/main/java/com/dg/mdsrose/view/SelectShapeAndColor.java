@@ -96,7 +96,7 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             .map(SelectShapeAndColor::mapShape)
             .toList();
 
-        new ShowProject(result, listShape);
+        new ShowProject(result, listShape, selectedColumns);
         this.dispose();
     }
 

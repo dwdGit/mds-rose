@@ -76,7 +76,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
         List<String> selectedValuesList = columnList.getSelectedValuesList();
         csvColumns.forEach(pair -> {
             if (selectedValuesList.contains(pair.getRight())) {
-                selectedColumns.put(pair.getLeft(), pair.getRight());
+                selectedColumns.put(pair.getLeft()+1, pair.getRight());
             }
         });
         new SelectShapeAndColor(this.path, selectedColumns);
