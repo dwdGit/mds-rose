@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS project (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(50) NOT NULL,
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
