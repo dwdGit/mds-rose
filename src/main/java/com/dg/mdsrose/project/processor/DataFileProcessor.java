@@ -87,11 +87,11 @@ public class DataFileProcessor extends FileProcessor {
 
     @Override
     public FileProcessorResult parseResult(ExtractedDatasetData extractedDatasetData, double[][] mds) {
-        List<DatasetRow> result = new ArrayList<>();
+        List<CompleteDatasetRow> result = new ArrayList<>();
         List<PartialDatasetRow> partialDatasetRows = extractedDatasetData.partialDatasetRows();
         for(int i = 0; i < partialDatasetRows.size(); i++) {
             PartialDatasetRow partialDatasetRow = partialDatasetRows.get(i);
-            result.add(new DatasetRow(partialDatasetRow.featureName(), partialDatasetRow.data(), mds[0][i], mds[1][i]));
+            result.add(new CompleteDatasetRow(partialDatasetRow.featureName(), partialDatasetRow.data(), mds[0][i], mds[1][i]));
         }
 
         return new FileProcessorResult(result, extractedDatasetData.classes());

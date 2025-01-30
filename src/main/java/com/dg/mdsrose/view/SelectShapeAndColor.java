@@ -1,10 +1,11 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.enums.Colors;
-import com.dg.mdsrose.enums.Shapes;
-import com.dg.mdsrose.project.ConcreteShapeBuilder;
-import com.dg.mdsrose.project.Shape;
-import com.dg.mdsrose.project.ShapeClass;
+import com.dg.mdsrose.enums.ColorOption;
+import com.dg.mdsrose.enums.MarkerOption;
+import com.dg.mdsrose.project.ProjectService;
+import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
+import com.dg.mdsrose.project.builder.SelectedShape;
+import com.dg.mdsrose.project.model.Shape;
 import com.dg.mdsrose.project.processor.DataFileProcessor;
 import com.dg.mdsrose.project.processor.FileProcessorResult;
 
@@ -13,23 +14,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class SelectShapeAndColor extends JFrame implements ActionListener {
     private JPanel selectShapeAndColorPanel;
     private JButton confirmButton;
     private JPanel classesPanel;
 
-
-    private final String[] colors = {Colors.BLUE.getValue(), Colors.GREEN.getValue(), Colors.RED.getValue(), Colors.BLACK.getValue(), Colors.YELLOW.getValue()};
-    private final String[] markers = {Shapes.CIRCLE.getValue(), Shapes.SQUARE.getValue(), Shapes.TRIANGLE_UP.getValue(), Shapes.TRIANGLE_DOWN.getValue(), Shapes.DIAMOND.getValue()};
+    private final ProjectService projectService = ProjectService.getInstance();
+    private final String[] colors = {ColorOption.BLUE.getValue(), ColorOption.GREEN.getValue(), ColorOption.RED.getValue(), ColorOption.BLACK.getValue(), ColorOption.YELLOW.getValue()};
+    private final String[] markers = {MarkerOption.CIRCLE.getValue(), MarkerOption.SQUARE.getValue(), MarkerOption.TRIANGLE_UP.getValue(), MarkerOption.TRIANGLE_DOWN.getValue(), MarkerOption.DIAMOND.getValue()};
     private final String path;
+    private final List<JComboBox<String>> colorComponents = new ArrayList<>();
+    private final List<JComboBox<String>> markerComponents = new ArrayList<>();
+    private final List<JLabel> labelComponents = new ArrayList<>();
+
     private Map<Integer, String> selectedColumns = new HashMap<>();
     private FileProcessorResult result;
-    private List<JComboBox<String>> colorComponents = new ArrayList<>();
-    private List<JComboBox<String>> markerComponents = new ArrayList<>();
-    private List<JLabel> labelComponents = new ArrayList<>();
     private int numClasses;
 
     SelectShapeAndColor(String path, Map<Integer, String> selectedColumns) {
@@ -91,12 +93,13 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             return;
         }
 
-        List<ShapeClass> shapeClasses = getShapeClasses();
-        List<Shape> listShape = shapeClasses.stream()
+        List<SelectedShape> selectedShapes = getShapeClasses();
+        List<Shape> shapes = selectedShapes.stream()
             .map(SelectShapeAndColor::mapShape)
             .toList();
 
-        new ShowProject(result, listShape, selectedColumns);
+        projectService.create(result.completeDatasetRows(), shapes, selectedColumns);
+        new ShowProject();
         this.dispose();
     }
 
@@ -105,8 +108,8 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             for (int j = 0; j < colorComponents.size(); j++) {
                 if (
                     i != j &&
-                        Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
-                        Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
+                    Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
+                    Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
                 ) {
                     return true;
                 }
@@ -115,24 +118,24 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
         return false;
     }
 
-    private static Shape mapShape(ShapeClass shapeClass) {
+    private static Shape mapShape(SelectedShape selectedShape) {
         ConcreteShapeBuilder shapeBuilder = new ConcreteShapeBuilder();
-        shapeBuilder.setColor(Objects.requireNonNull(Colors.from(shapeClass.getColor())).getColor());
-        shapeBuilder.setMarker(Objects.requireNonNull(Shapes.from(shapeClass.getMarker())).getShape());
-        shapeBuilder.setLabel(shapeClass.getLabel());
+        shapeBuilder.setColor(ColorOption.from(selectedShape.getColor()));
+        shapeBuilder.setMarker(MarkerOption.from(selectedShape.getMarker()));
+        shapeBuilder.setLabel(selectedShape.getLabel());
         return shapeBuilder.getResult();
     }
 
-    private List<ShapeClass> getShapeClasses() {
-        List<ShapeClass> shapeClasses = new ArrayList<>();
+    private List<SelectedShape> getShapeClasses() {
+        List<SelectedShape> selectedShapes = new ArrayList<>();
         for (int i = 0; i < numClasses; i++) {
-            ShapeClass shapeClass = new ShapeClass();
-            shapeClass.setColor(Objects.requireNonNull(colorComponents.get(i).getSelectedItem()).toString());
-            shapeClass.setMarker(Objects.requireNonNull(markerComponents.get(i).getSelectedItem()).toString());
-            shapeClass.setLabel(labelComponents.get(i).getText());
-            shapeClasses.add(shapeClass);
+            SelectedShape selectedShape = new SelectedShape();
+            selectedShape.setColor(Objects.requireNonNull(colorComponents.get(i).getSelectedItem()).toString());
+            selectedShape.setMarker(Objects.requireNonNull(markerComponents.get(i).getSelectedItem()).toString());
+            selectedShape.setLabel(labelComponents.get(i).getText());
+            selectedShapes.add(selectedShape);
         }
-        return shapeClasses;
+        return selectedShapes;
     }
 
     {

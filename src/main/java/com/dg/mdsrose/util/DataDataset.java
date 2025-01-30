@@ -5,25 +5,22 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class DataDataset {
-
+    private static final String DELIMETER = ",";
 
     private final String path;
-    private final String delimiter = ",";
-
 
     public DataDataset(String path) {
         this.path = path;
     }
 
-    public Integer getNumberOfColumns(){
+    public Integer getNumberOfColumns() {
         int numberOfColumns = 0;
+
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String headerLine = br.readLine();
-            numberOfColumns = headerLine.split(delimiter).length;
+            numberOfColumns = headerLine.split(DELIMETER).length;
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            throw new RuntimeException(e);
+            System.err.println(e.getMessage());
         }
         return numberOfColumns;
     }

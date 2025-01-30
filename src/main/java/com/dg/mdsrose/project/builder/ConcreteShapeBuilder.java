@@ -1,20 +1,22 @@
-package com.dg.mdsrose.project;
+package com.dg.mdsrose.project.builder;
 
-import java.awt.*;
+import com.dg.mdsrose.enums.ColorOption;
+import com.dg.mdsrose.enums.MarkerOption;
+import com.dg.mdsrose.project.model.Shape;
 
 public class ConcreteShapeBuilder implements ShapeBuilder {
 
-    private Color color;
-    private java.awt.Shape marker;
+    private ColorOption color;
+    private MarkerOption marker;
     private String label;
 
     @Override
-    public void setMarker(java.awt.Shape marker) {
+    public void setMarker(MarkerOption marker) {
         this.marker = marker;
     }
 
     @Override
-    public void setColor(Color color) {
+    public void setColor(ColorOption color) {
         this.color = color;
     }
 

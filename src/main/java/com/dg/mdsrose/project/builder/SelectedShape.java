@@ -1,6 +1,6 @@
-package com.dg.mdsrose.project;
+package com.dg.mdsrose.project.builder;
 
-public class ShapeClass {
+public class SelectedShape {
 
     private String color;
     private String marker;

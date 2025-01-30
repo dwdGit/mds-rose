@@ -1,8 +1,8 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.dataset.CsvStrategy;
-import com.dg.mdsrose.dataset.DataStrategy;
-import com.dg.mdsrose.dataset.DatasetStrategy;
+import com.dg.mdsrose.project.dataset.CsvStrategy;
+import com.dg.mdsrose.project.dataset.DataStrategy;
+import com.dg.mdsrose.project.dataset.DatasetStrategy;
 import com.dg.mdsrose.util.DatasetFileFilter;
 
 import javax.swing.*;

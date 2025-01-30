@@ -1,7 +1,8 @@
 package com.dg.mdsrose.enums;
 
 public enum DBTable {
-    USER("user");
+    USER("user"),
+    PROJECT("project"),;
 
     private final String value;
 

@@ -2,17 +2,17 @@ package com.dg.mdsrose.enums;
 
 import java.awt.*;
 
-public enum Colors {
+public enum ColorOption {
     RED("Red",Color.RED),
     GREEN("Green",Color.GREEN),
     YELLOW("Yellow",Color.YELLOW),
     BLACK("Black",Color.BLACK),
     BLUE("Blue",Color.BLUE);
 
-    private String value;
-    private Color color;
+    private final String value;
+    private final Color color;
 
-    Colors(String value, Color color) {
+    ColorOption(String value, Color color) {
         this.value = value;
         this.color = color;
     }
@@ -25,10 +25,10 @@ public enum Colors {
         return color;
     }
 
-    public static Colors from(String color) {
-        for (Colors colors : Colors.values()) {
-            if (colors.getValue().equals(color)) {
-                return colors;
+    public static ColorOption from(String colorValue) {
+        for (ColorOption color : ColorOption.values()) {
+            if (color.getValue().equals(colorValue)) {
+                return color;
             }
         }
         return null;

@@ -2,7 +2,7 @@ package com.dg.mdsrose.enums;
 
 import java.awt.*;
 
-public enum Shapes {
+public enum MarkerOption {
     SQUARE("Square", new java.awt.geom.Rectangle2D.Double(-3, -3, 6, 6)),
     TRIANGLE_UP("Triangle up", new java.awt.Polygon(new int[]{-5, 5, 0}, new int[]{5, 5, -5}, 3)),
     TRIANGLE_DOWN("Triangle down", new java.awt.Polygon(new int[]{-5, 5, 0}, new int[]{-5, -5, 5}, 3)),
@@ -12,7 +12,7 @@ public enum Shapes {
     private final String value;
     private final Shape shape;
 
-    Shapes(String value, Shape shape) {
+    MarkerOption(String value, Shape shape) {
         this.value = value;
         this.shape = shape;
     }
@@ -25,8 +25,8 @@ public enum Shapes {
         return shape;
     }
 
-    public static Shapes from(String marker) {
-        for (Shapes shape : Shapes.values()) {
+    public static MarkerOption from(String marker) {
+        for (MarkerOption shape : MarkerOption.values()) {
             if (shape.getValue().equals(marker)) {
                 return shape;
             }

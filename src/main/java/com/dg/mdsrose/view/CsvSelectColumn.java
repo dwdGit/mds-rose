@@ -14,11 +14,11 @@ import java.util.Optional;
 
 public class CsvSelectColumn extends JFrame implements ActionListener {
     private JPanel selectColumnPanel;
-    private JList columnList;
+    private JList<String> columnList;
     private JButton confirmButton;
 
     private final String path;
-    private Map<Integer, String> selectedColumns = new HashMap<>();
+    private final Map<Integer, String> selectedColumns = new HashMap<>();
     private List<Pair<Integer, String>> csvColumns;
 
     public CsvSelectColumn(String path) {
@@ -50,9 +50,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
         }
         DefaultListModel<String> listModel = new DefaultListModel<>();
         csvColumns = optionalCsvColumns.get();
-        csvColumns.forEach(pair -> {
-            listModel.addElement(pair.getRight());
-        });
+        csvColumns.forEach(pair -> listModel.addElement(pair.getRight()));
         columnList.setModel(listModel);
     }
 
@@ -76,7 +74,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
         List<String> selectedValuesList = columnList.getSelectedValuesList();
         csvColumns.forEach(pair -> {
             if (selectedValuesList.contains(pair.getRight())) {
-                selectedColumns.put(pair.getLeft()+1, pair.getRight());
+                selectedColumns.put(pair.getLeft() + 1, pair.getRight());
             }
         });
         new SelectShapeAndColor(this.path, selectedColumns);

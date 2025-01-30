@@ -1,6 +1,6 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.user.User;
+import com.dg.mdsrose.user.model.User;
 import com.dg.mdsrose.user.UserService;
 import com.dg.mdsrose.user.UserSession;
 

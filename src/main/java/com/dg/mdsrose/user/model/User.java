@@ -1,4 +1,4 @@
-package com.dg.mdsrose.user;
+package com.dg.mdsrose.user.model;
 
 
 public class User {

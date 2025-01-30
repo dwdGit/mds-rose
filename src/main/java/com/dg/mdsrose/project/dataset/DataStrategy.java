@@ -1,4 +1,4 @@
-package com.dg.mdsrose.dataset;
+package com.dg.mdsrose.project.dataset;
 
 import com.dg.mdsrose.view.DataSelectColumn;
 

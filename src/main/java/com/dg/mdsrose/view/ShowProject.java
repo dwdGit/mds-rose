@@ -1,8 +1,12 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.project.Shape;
-import com.dg.mdsrose.project.processor.DatasetRow;
-import com.dg.mdsrose.project.processor.FileProcessorResult;
+import com.dg.mdsrose.enums.ColorOption;
+import com.dg.mdsrose.enums.MarkerOption;
+import com.dg.mdsrose.project.ProjectService;
+import com.dg.mdsrose.project.model.DatasetClass;
+import com.dg.mdsrose.project.model.DatasetFeature;
+import com.dg.mdsrose.project.model.DatasetFeatureRow;
+import com.dg.mdsrose.project.model.DatasetRow;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -29,12 +33,14 @@ public class ShowProject extends JFrame implements ActionListener {
     private JButton showPointsButton;
     private JPanel chartContainerPanel;
 
-    private final Map<Integer, String> selectedColumns;
-    private final FileProcessorResult fileProcessorResult;
+    private final ProjectService projectService = ProjectService.getInstance();
+    private final List<DatasetClass> datasetClasses;
+    private final List<DatasetRow> datasetRows;
+    private final List<DatasetFeature> datasetFeatures;
     private DefaultTableModel selectedPoints;
 
 
-    public ShowProject(FileProcessorResult result, List<Shape> shapes, Map<Integer, String> selectedColumns) {
+    public ShowProject() {
         this.setTitle("Show project");
         this.setContentPane(showProjectPanel);
         this.setPreferredSize(new Dimension(800, 640));
@@ -42,42 +48,45 @@ public class ShowProject extends JFrame implements ActionListener {
         this.pack();
         this.setLocationRelativeTo(null);
 
-        this.fileProcessorResult = result;
-        this.selectedColumns = selectedColumns;
-
         showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
         chartContainerPanel.setLayout(new GridLayout(1, 1));
         showProjectPanel.add(chartContainerPanel);
 
-        generateChart(result, shapes);
+        datasetClasses = projectService.findAllDatasetClasses();
+        datasetRows = projectService.findAllDatasetRows();
+        datasetFeatures = projectService.findAllDatasetFeatures();
+        generateChart();
         this.setVisible(true);
         showPointsButton.addActionListener(this);
     }
 
-    private void generateChart(FileProcessorResult result, List<Shape> shapes) {
-        Map<String, XYSeries> chartDataMap = generateChartData(result, shapes);
+    private void generateChart() {
+        Map<Long, XYSeries> chartDataMap = generateChartData();
         XYSeriesCollection dataset = new XYSeriesCollection();
         chartDataMap.keySet()
-                .forEach(key -> dataset.addSeries(chartDataMap.get(key)));
+            .forEach(key -> dataset.addSeries(chartDataMap.get(key)));
 
         // Create chart
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "MDS Graph",
-                "X",
-                "Y",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
+            "MDS Graph",
+            "X",
+            "Y",
+            dataset,
+            PlotOrientation.VERTICAL,
+            true,
+            true,
+            false
         );
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         int currIdx = 0;
-        for (Shape shape : shapes) {
-            renderer.setSeriesPaint(currIdx, shape.getColor());
+        for (DatasetClass datasetClass : datasetClasses) {
+            ColorOption colorOption = ColorOption.valueOf(datasetClass.getColor());
+            MarkerOption markerOption = MarkerOption.valueOf(datasetClass.getMarker());
+
+            renderer.setSeriesPaint(currIdx, colorOption.getColor());
             renderer.setSeriesShapesVisible(currIdx, true);
-            renderer.setSeriesShape(currIdx, shape.getMarker());
+            renderer.setSeriesShape(currIdx, markerOption.getShape());
             renderer.setSeriesLinesVisible(currIdx, false);
             currIdx++;
         }
@@ -106,27 +115,25 @@ public class ShowProject extends JFrame implements ActionListener {
         double yLowerBound = rangeAxis.getLowerBound();
         double yUpperBound = rangeAxis.getUpperBound();
 
-        List<DatasetRow> datasetRows = fileProcessorResult.datasetRows();
         List<DatasetRow> listSelectedPoints = datasetRows.stream()
-                .filter(datasetRow -> datasetRow.x() >= xLowerBound && datasetRow.x() <= xUpperBound &&
-                        datasetRow.y() >= yLowerBound && datasetRow.y() <= yUpperBound)
-                .toList();
+            .filter(datasetRow -> datasetRow.getX() >= xLowerBound && datasetRow.getX() <= xUpperBound &&
+                datasetRow.getY() >= yLowerBound && datasetRow.getY() <= yUpperBound)
+            .toList();
         if (ObjectUtils.isNotEmpty(listSelectedPoints)) {
 
             DefaultTableModel model = new DefaultTableModel();
             model.addColumn("class");
             model.addColumn("mds-x");
             model.addColumn("mds-y");
-            selectedColumns.values().forEach(model::addColumn);
+            datasetFeatures.forEach(datasetFeature -> model.addColumn(datasetFeature.getName()));
             listSelectedPoints.forEach(datasetRow -> {
-                int arraySize = datasetRow.features().length;
-                Object[] tableRow = new Object[3 + arraySize];
-                tableRow[0] = datasetRow.label();
-                tableRow[1] = datasetRow.x();
-                tableRow[2] = datasetRow.y();
-                double[] array = datasetRow.features();
-                for (int i = 0; i < arraySize; i++) {
-                    tableRow[3 + i] = array[i];
+                List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowId(datasetRow.getId());
+                Object[] tableRow = new Object[3 + datasetFeatureRows.size()];
+                tableRow[0] = projectService.findDatasetClassById(datasetRow.getClassId()).getName();
+                tableRow[1] = datasetRow.getX();
+                tableRow[2] = datasetRow.getY();
+                for (int i = 0; i < datasetFeatureRows.size(); i++) {
+                    tableRow[3 + i] = datasetFeatureRows.get(i).getValue();
                 }
                 model.addRow(tableRow);
             });
@@ -134,12 +141,14 @@ public class ShowProject extends JFrame implements ActionListener {
         }
     }
 
-    private static Map<String, XYSeries> generateChartData(FileProcessorResult result, List<Shape> shapes) {
-        Map<String, XYSeries> dataMap = new HashMap<>();
-        shapes.forEach(shape -> dataMap.put(shape.getLabel(), new XYSeries(shape.getLabel())));
-        result.datasetRows().forEach(datasetRow ->
-                dataMap.get(datasetRow.label())
-                        .add(datasetRow.x(), datasetRow.y())
+    private Map<Long, XYSeries> generateChartData() {
+        Map<Long, XYSeries> dataMap = new HashMap<>();
+        datasetClasses.forEach(datasetClass ->
+            dataMap.put(datasetClass.getId(), new XYSeries(datasetClass.getName()))
+        );
+        datasetRows.forEach(datasetRow ->
+            dataMap.get(datasetRow.getClassId())
+                .add(datasetRow.getX(), datasetRow.getY())
         );
         return dataMap;
     }

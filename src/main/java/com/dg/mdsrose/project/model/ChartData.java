@@ -1,4 +1,4 @@
-package com.dg.mdsrose.model;
+package com.dg.mdsrose.project.model;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,14 +2,14 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.util.DataDataset;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class DataSelectColumn extends JFrame implements ActionListener {
 
@@ -20,7 +20,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JButton generateRowButton;
     private JPanel rowPanel;
 
-    private Map<Integer, String> selectedColumns = new HashMap<>();
+    private final Map<Integer, String> selectedColumns = new HashMap<>();
     private final String path;
     private final String prefixIndexColumnInputField = "numberColumn";
     private final String prefixNameColumnInputField = "nameColumn";
