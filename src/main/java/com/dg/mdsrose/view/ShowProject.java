@@ -33,14 +33,19 @@ public class ShowProject extends JFrame implements ActionListener {
     private JButton showPointsButton;
     private JPanel chartContainerPanel;
 
-    private final ProjectService projectService = ProjectService.getInstance();
+    private final ProjectService projectService;
     private final List<DatasetClass> datasetClasses;
     private final List<DatasetRow> datasetRows;
     private final List<DatasetFeature> datasetFeatures;
     private DefaultTableModel selectedPoints;
 
 
-    public ShowProject() {
+    public ShowProject(ProjectService projectService, Long projectId) {
+        this.projectService = projectService;
+        this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
+        this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
+        this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
+
         this.setTitle("Show project");
         this.setContentPane(showProjectPanel);
         this.setPreferredSize(new Dimension(800, 640));
@@ -52,9 +57,6 @@ public class ShowProject extends JFrame implements ActionListener {
         chartContainerPanel.setLayout(new GridLayout(1, 1));
         showProjectPanel.add(chartContainerPanel);
 
-        datasetClasses = projectService.findAllDatasetClasses();
-        datasetRows = projectService.findAllDatasetRows();
-        datasetFeatures = projectService.findAllDatasetFeatures();
         generateChart();
         this.setVisible(true);
         showPointsButton.addActionListener(this);

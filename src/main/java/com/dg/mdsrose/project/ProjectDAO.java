@@ -1,52 +1,29 @@
 package com.dg.mdsrose.project;
 
-import com.dg.mdsrose.db.DB;
-import com.dg.mdsrose.enums.DBTable;
-import com.dg.mdsrose.project.model.Project;
+import com.dg.mdsrose.project.model.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.StringJoiner;
+import java.util.List;
 
-public class ProjectDAO {
-    private static ProjectDAO instance;
+public interface ProjectDAO {
+    Long insertProject(Project project);
 
-    public static ProjectDAO getInstance() {
-        if (instance == null) {
-            instance = new ProjectDAO();
-        }
-        return instance;
-    }
+    Long insertDatasetClass(Shape shape, Long projectId);
 
-    public Long save(Project project) {
-        String sql = new StringJoiner(" ")
-            .add("INSERT INTO")
-            .add(DBTable.PROJECT.getValue())
-            .add("(name, user_id) VALUES (?, ?)")
-            .toString();
-        ResultSet resultSet = null;
+    Long insertDatasetFeatures(String name, Long projectId);
 
-        try (
-            Connection connection = DB.createConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)
-        ){
-            preparedStatement.setString(1, project.getName());
-            preparedStatement.setLong(2, project.getUserId());
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getLong(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                } catch (SQLException _) {}
-            }
-        }
-        return -1L;
-    }
+    Long insertDatasetRow(Long classId, double x, double y, Long projectId);
+
+    Long insertDatasetFeatureRow(Long featureId, Long rowId, double value);
+
+    DatasetClass findDatasetClassById(Long id);
+
+    DatasetFeature findDatasetFeatureById(Long id);
+
+    List<DatasetClass> findDatasetClassesByProjectId(Long projectId);
+
+    List<DatasetRow> findDatasetRowsByProjectId(Long projectId);
+
+    List<DatasetFeature> findDatasetFeaturesByProjectId(Long projectId);
+
+    List<DatasetFeatureRow> findDatasetFeatureRowsByRowId(Long rowId);
 }

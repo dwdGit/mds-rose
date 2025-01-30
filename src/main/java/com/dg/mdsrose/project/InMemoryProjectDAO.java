@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class InMemoryProjectRepository implements ProjectRepository {
-    private static final InMemoryProjectRepository instance = new InMemoryProjectRepository();
+public class InMemoryProjectDAO implements ProjectDAO {
     private final Map<Long, Project> projects = new HashMap<>();
     private final Map<Long, DatasetClass> datasetClasses = new HashMap<>();
     private final Map<Long, DatasetFeature> datasetFeatures = new HashMap<>();
@@ -20,11 +19,7 @@ public class InMemoryProjectRepository implements ProjectRepository {
     private final AtomicLong datasetRowsSequence = new AtomicLong(0);
     private final AtomicLong datasetFeatureRowsSequence = new AtomicLong(0);
 
-    private InMemoryProjectRepository() {}
-
-    public static InMemoryProjectRepository getInstance() {
-        return instance;
-    }
+    public InMemoryProjectDAO() {}
 
     @Override
     public Long insertProject(Project project) {
@@ -83,23 +78,26 @@ public class InMemoryProjectRepository implements ProjectRepository {
     }
 
     @Override
-    public List<DatasetClass> findAllDatasetClasses() {
+    public List<DatasetClass> findDatasetClassesByProjectId(Long projectId) {
         return datasetClasses.values()
             .stream()
+            .filter(datasetClass -> datasetClass.getProjectId().equals(projectId))
             .toList();
     }
 
     @Override
-    public List<DatasetRow> findAllDatasetRows() {
+    public List<DatasetRow> findDatasetRowsByProjectId(Long projectId) {
         return datasetRows.values()
             .stream()
+            .filter(datasetRow -> datasetRow.getProjectId().equals(projectId))
             .toList();
     }
 
     @Override
-    public List<DatasetFeature> findAllDatasetFeatures() {
+    public List<DatasetFeature> findDatasetFeaturesByProjectId(Long projectId) {
         return datasetFeatures.values()
             .stream()
+            .filter(datasetFeature -> datasetFeature.getProjectId().equals(projectId))
             .toList();
     }
 

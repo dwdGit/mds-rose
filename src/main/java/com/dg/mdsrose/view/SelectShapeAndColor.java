@@ -2,6 +2,7 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.enums.ColorOption;
 import com.dg.mdsrose.enums.MarkerOption;
+import com.dg.mdsrose.project.InMemoryProjectViewer;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
 import com.dg.mdsrose.project.builder.SelectedShape;
@@ -98,8 +99,9 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             .map(SelectShapeAndColor::mapShape)
             .toList();
 
-        projectService.create(result.completeDatasetRows(), shapes, selectedColumns);
-        new ShowProject();
+        Long projectId = projectService.save(result.completeDatasetRows(), shapes, selectedColumns);
+        new InMemoryProjectViewer()
+            .retrieveProject(projectId);
         this.dispose();
     }
 

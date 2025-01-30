@@ -9,20 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ProjectService {
-    private static final ProjectService instance = new ProjectService();
-    private final InMemoryProjectRepository projectRepository;
+    private final ProjectDAO projectDAO;
     private final UserSession userSession;
 
-    private ProjectService() {
-        this.projectRepository = InMemoryProjectRepository.getInstance();
+    public ProjectService(ProjectDAO projectDAO) {
+        this.projectDAO = projectDAO;
         this.userSession = UserSession.getInstance();
     }
 
-    public static ProjectService getInstance() {
-        return instance;
-    }
-
-    public Long create(
+    public Long save(
         List<CompleteDatasetRow> datasetRows,
         List<Shape> shapes,
         Map<Integer, String> features
@@ -30,19 +25,19 @@ public class ProjectService {
         Map<String, Long> classIds = new HashMap<>();
         Map<Integer, Long> featureIds = new HashMap<>();
         Project project = new Project(userSession.getUserId());
-        Long projectId = projectRepository.insertProject(project);
+        Long projectId = projectDAO.insertProject(project);
 
         shapes.forEach(shape ->
-            classIds.put(shape.getLabel(), projectRepository.insertDatasetClass(shape, projectId))
+            classIds.put(shape.getLabel(), projectDAO.insertDatasetClass(shape, projectId))
         );
 
         int currIdx = 0;
         for(String name : features.values()) {
-            featureIds.put(currIdx++, projectRepository.insertDatasetFeatures(name, projectId));
+            featureIds.put(currIdx++, projectDAO.insertDatasetFeatures(name, projectId));
         }
 
         datasetRows.forEach(datasetRow -> {
-            Long rowId = projectRepository.insertDatasetRow(
+            Long rowId = projectDAO.insertDatasetRow(
                 classIds.get(datasetRow.label()),
                 datasetRow.x(),
                 datasetRow.y(),
@@ -50,30 +45,30 @@ public class ProjectService {
             );
 
             for(int i = 0; i < datasetRow.features().length; i++) {
-                projectRepository.insertDatasetFeatureRow(featureIds.get(i), rowId, datasetRow.features()[i]);
+                projectDAO.insertDatasetFeatureRow(featureIds.get(i), rowId, datasetRow.features()[i]);
             }
         });
 
         return projectId;
     }
 
-    public List<DatasetClass> findAllDatasetClasses() {
-        return projectRepository.findAllDatasetClasses();
+    public List<DatasetClass> findDatasetClassesByProjectId(Long projectId) {
+        return projectDAO.findDatasetClassesByProjectId(projectId);
     }
 
-    public List<DatasetRow> findAllDatasetRows() {
-        return projectRepository.findAllDatasetRows();
+    public List<DatasetRow> findDatasetRowsByProjectId(Long projectId) {
+        return projectDAO.findDatasetRowsByProjectId(projectId);
     }
 
-    public List<DatasetFeature> findAllDatasetFeatures() {
-        return projectRepository.findAllDatasetFeatures();
+    public List<DatasetFeature> findDatasetFeaturesByProjectId(Long projectId) {
+        return projectDAO.findDatasetFeaturesByProjectId(projectId);
     }
 
     public List<DatasetFeatureRow> findDatasetFeatureRowsByRowId(Long rowId) {
-        return projectRepository.findDatasetFeatureRowsByRowId(rowId);
+        return projectDAO.findDatasetFeatureRowsByRowId(rowId);
     }
 
     public DatasetClass findDatasetClassById(Long id) {
-        return projectRepository.findDatasetClassById(id);
+        return projectDAO.findDatasetClassById(id);
     }
 }
