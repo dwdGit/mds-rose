@@ -8,6 +8,8 @@ public class DatasetFeatureRow {
     private Long rowId;
     private double value;
 
+    public DatasetFeatureRow() {}
+
     public DatasetFeatureRow(Long featureId, Long rowId, double value) {
         this.featureId = featureId;
         this.rowId = rowId;

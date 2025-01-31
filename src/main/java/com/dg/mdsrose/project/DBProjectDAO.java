@@ -2,12 +2,7 @@ package com.dg.mdsrose.project;
 
 import com.dg.mdsrose.db.DB;
 import com.dg.mdsrose.enums.DBTable;
-import com.dg.mdsrose.project.model.DatasetClass;
-import com.dg.mdsrose.project.model.DatasetFeature;
-import com.dg.mdsrose.project.model.DatasetFeatureRow;
-import com.dg.mdsrose.project.model.DatasetRow;
-import com.dg.mdsrose.project.model.Project;
-import com.dg.mdsrose.project.model.Shape;
+import com.dg.mdsrose.project.model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -184,7 +179,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public Optional<DatasetClass> findDatasetClassById(Long id) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, marker, color, project_id FROM")
                 .add(DBTable.DATASET_CLASS.getValue())
                 .add("WHERE id = ?")
                 .toString();
@@ -197,7 +192,13 @@ public class DBProjectDAO implements ProjectDAO {
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
             if(resultSet.next()) {
-                return Optional.ofNullable(resultSet.getObject(DBTable.DATASET_CLASS.getValue(), DatasetClass.class));
+                DatasetClass datasetClass = new DatasetClass();
+                datasetClass.setId(resultSet.getLong(1));
+                datasetClass.setName(resultSet.getString(2));
+                datasetClass.setMarker(resultSet.getString(3));
+                datasetClass.setColor(resultSet.getString(4));
+                datasetClass.setProjectId(resultSet.getLong(5));
+                return Optional.of(datasetClass);
             }
         } catch (SQLException e){
             throw new RuntimeException(e);
@@ -214,7 +215,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public Optional<DatasetFeature> findDatasetFeatureById(Long id) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, project_id FROM")
                 .add(DBTable.DATASET_FEATURE.getValue())
                 .add("WHERE id = ?")
                 .toString();
@@ -227,7 +228,11 @@ public class DBProjectDAO implements ProjectDAO {
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
             if(resultSet.next()) {
-                return Optional.ofNullable(resultSet.getObject(DBTable.DATASET_FEATURE.getValue(), DatasetFeature.class));
+                DatasetFeature datasetFeature = new DatasetFeature();
+                datasetFeature.setId(resultSet.getLong(1));
+                datasetFeature.setName(resultSet.getString(2));
+                datasetFeature.setProjectId(resultSet.getLong(3));
+                return Optional.of(datasetFeature);
             }
         } catch (SQLException e){
             throw new RuntimeException(e);
@@ -244,7 +249,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public List<DatasetClass> findDatasetClassesByProjectId(Long projectId) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, marker, color, project_id FROM")
                 .add(DBTable.DATASET_CLASS.getValue())
                 .add("WHERE project_id = ?")
                 .toString();
@@ -258,7 +263,13 @@ public class DBProjectDAO implements ProjectDAO {
             resultSet = preparedStatement.executeQuery();
             List<DatasetClass> resultList = new ArrayList<>();
             while(resultSet.next()) {
-                resultList.add(resultSet.getObject(DBTable.DATASET_CLASS.getValue(), DatasetClass.class));
+                DatasetClass datasetClass = new DatasetClass();
+                datasetClass.setId(resultSet.getLong(1));
+                datasetClass.setName(resultSet.getString(2));
+                datasetClass.setMarker(resultSet.getString(3));
+                datasetClass.setColor(resultSet.getString(4));
+                datasetClass.setProjectId(resultSet.getLong(5));
+                resultList.add(datasetClass);
             }
             return resultList;
         } catch (SQLException e){
@@ -275,7 +286,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public List<DatasetRow> findDatasetRowsByProjectId(Long projectId) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, x, y, class_id, project_id FROM")
                 .add(DBTable.DATASET_ROW.getValue())
                 .add("WHERE project_id = ?")
                 .toString();
@@ -289,7 +300,13 @@ public class DBProjectDAO implements ProjectDAO {
             resultSet = preparedStatement.executeQuery();
             List<DatasetRow> resultList = new ArrayList<>();
             while(resultSet.next()) {
-                resultList.add(resultSet.getObject(DBTable.DATASET_ROW.getValue(), DatasetRow.class));
+                DatasetRow datasetRow = new DatasetRow();
+                datasetRow.setId(resultSet.getLong(1));
+                datasetRow.setX(resultSet.getDouble(2));
+                datasetRow.setY(resultSet.getDouble(3));
+                datasetRow.setClassId(resultSet.getLong(4));
+                datasetRow.setProjectId(resultSet.getLong(5));
+                resultList.add(datasetRow);
             }
             return resultList;
         } catch (SQLException e){
@@ -306,7 +323,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public List<DatasetFeature> findDatasetFeaturesByProjectId(Long projectId) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, project_id FROM")
                 .add(DBTable.DATASET_FEATURE.getValue())
                 .add("WHERE project_id = ?")
                 .toString();
@@ -320,7 +337,11 @@ public class DBProjectDAO implements ProjectDAO {
             resultSet = preparedStatement.executeQuery();
             List<DatasetFeature> resultList = new ArrayList<>();
             while(resultSet.next()) {
-                resultList.add(resultSet.getObject(DBTable.DATASET_FEATURE.getValue(), DatasetFeature.class));
+                DatasetFeature datasetFeature = new DatasetFeature();
+                datasetFeature.setId(resultSet.getLong(1));
+                datasetFeature.setName(resultSet.getString(2));
+                datasetFeature.setProjectId(resultSet.getLong(3));
+                resultList.add(datasetFeature);
             }
             return resultList;
         } catch (SQLException e){
@@ -337,7 +358,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public List<DatasetFeatureRow> findDatasetFeatureRowsByRowId(Long rowId) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT dataset_row_id, dataset_feature_id, value  FROM")
                 .add(DBTable.DATASET_FEATURE_ROW.getValue())
                 .add("WHERE dataset_row_id = ?")
                 .toString();
@@ -351,7 +372,11 @@ public class DBProjectDAO implements ProjectDAO {
             resultSet = preparedStatement.executeQuery();
             List<DatasetFeatureRow> resultList = new ArrayList<>();
             while(resultSet.next()) {
-                resultList.add(resultSet.getObject(DBTable.DATASET_FEATURE_ROW.getValue(), DatasetFeatureRow.class));
+                DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow();
+                datasetFeatureRow.setRowId(resultSet.getLong(1));
+                datasetFeatureRow.setFeatureId(resultSet.getLong(2));
+                datasetFeatureRow.setValue(resultSet.getDouble(3));
+                resultList.add(datasetFeatureRow);
             }
             return resultList;
         } catch (SQLException e){
@@ -368,7 +393,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public Optional<Project> findProject(Long id) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, user_id FROM")
                 .add(DBTable.PROJECT.getValue())
                 .add("WHERE id = ?")
                 .toString();
@@ -381,7 +406,11 @@ public class DBProjectDAO implements ProjectDAO {
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
             if(resultSet.next()) {
-                return Optional.ofNullable(resultSet.getObject(DBTable.PROJECT.getValue(), Project.class));
+                Project project = new Project();
+                project.setId(resultSet.getLong(1));
+                project.setName(resultSet.getString(2));
+                project.setUserId(resultSet.getLong(3));
+                return Optional.of(project);
             }
         } catch (SQLException e){
             throw new RuntimeException(e);
@@ -400,7 +429,7 @@ public class DBProjectDAO implements ProjectDAO {
         String placeholders = String.join(", ", rowIds.stream().map(id -> "?").toArray(String[]::new));
 
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT dataset_row_id, dataset_feature_id, value FROM")
                 .add(DBTable.DATASET_FEATURE_ROW.getValue())
                 .add("WHERE dataset_row_id IN (" + placeholders + ")")
                 .toString();
@@ -416,7 +445,11 @@ public class DBProjectDAO implements ProjectDAO {
             resultSet = preparedStatement.executeQuery();
             List<DatasetFeatureRow> resultList = new ArrayList<>();
             while(resultSet.next()) {
-                resultList.add(resultSet.getObject(DBTable.DATASET_FEATURE_ROW.getValue(), DatasetFeatureRow.class));
+                DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow();
+                datasetFeatureRow.setRowId(resultSet.getLong(1));
+                datasetFeatureRow.setFeatureId(resultSet.getLong(2));
+                datasetFeatureRow.setValue(resultSet.getDouble(3));
+                resultList.add(datasetFeatureRow);
             }
             return resultList;
         } catch (SQLException e){
@@ -433,7 +466,7 @@ public class DBProjectDAO implements ProjectDAO {
     @Override
     public List<Project> findProjectByUserId(Long id) {
         String sql = new StringJoiner(" ")
-                .add("SELECT * FROM")
+                .add("SELECT id, name, user_id FROM")
                 .add(DBTable.PROJECT.getValue())
                 .add("WHERE user_id = ?")
                 .toString();

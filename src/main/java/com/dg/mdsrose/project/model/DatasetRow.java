@@ -9,6 +9,8 @@ public class DatasetRow {
     private double y;
     private Long projectId;
 
+    public DatasetRow() {}
+
     public DatasetRow(Long classId, double x, double y, Long projectId) {
         this.classId = classId;
         this.x = x;

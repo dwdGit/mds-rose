@@ -7,6 +7,8 @@ public class DatasetFeature {
     private String name;
     private Long projectId;
 
+    public DatasetFeature() {}
+
     public DatasetFeature(Long id, String name, Long projectId) {
         this.id = id;
         this.name = name;

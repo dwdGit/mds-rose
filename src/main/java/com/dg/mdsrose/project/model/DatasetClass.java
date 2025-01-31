@@ -9,6 +9,8 @@ public class DatasetClass {
     private String color;
     private Long projectId;
 
+    public DatasetClass() {}
+
     public DatasetClass(String name, String marker, String color, Long projectId) {
         this.name = name;
         this.marker = marker;
