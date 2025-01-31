@@ -2,10 +2,8 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.enums.ColorOption;
 import com.dg.mdsrose.enums.MarkerOption;
-import com.dg.mdsrose.project.DBProjectDAO;
 import com.dg.mdsrose.project.DBProjectService;
 import com.dg.mdsrose.project.ProjectService;
-import com.dg.mdsrose.project.ProjectServiceFactory;
 import com.dg.mdsrose.project.model.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jfree.chart.ChartFactory;
@@ -20,10 +18,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +39,7 @@ public class ShowProject extends JFrame implements ActionListener {
     private Long projectId;
 
 
-    public ShowProject(ProjectService projectService, Long projectId) {
+    public ShowProject(ProjectService projectService, Long projectId, boolean canSave) {
         this.projectService = projectService;
         this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
         this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
@@ -54,9 +49,14 @@ public class ShowProject extends JFrame implements ActionListener {
         this.setTitle("Show project");
         this.setContentPane(showProjectPanel);
         this.setPreferredSize(new Dimension(800, 640));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
 
         showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
         chartContainerPanel.setLayout(new GridLayout(1, 1));
@@ -65,6 +65,8 @@ public class ShowProject extends JFrame implements ActionListener {
         generateChart();
         this.setVisible(true);
 
+        saveButton.setVisible(canSave);
+        saveButton.setEnabled(canSave);
         showPointsButton.addActionListener(this);
         saveButton.addActionListener(this);
     }
@@ -73,18 +75,18 @@ public class ShowProject extends JFrame implements ActionListener {
         Map<Long, XYSeries> chartDataMap = generateChartData();
         XYSeriesCollection dataset = new XYSeriesCollection();
         chartDataMap.keySet()
-                .forEach(key -> dataset.addSeries(chartDataMap.get(key)));
+            .forEach(key -> dataset.addSeries(chartDataMap.get(key)));
 
         // Create chart
         JFreeChart chart = ChartFactory.createXYLineChart(
-                "MDS Graph",
-                "X",
-                "Y",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
+            "MDS Graph",
+            "X",
+            "Y",
+            dataset,
+            PlotOrientation.VERTICAL,
+            true,
+            true,
+            false
         );
 
         XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
@@ -125,9 +127,9 @@ public class ShowProject extends JFrame implements ActionListener {
         double yUpperBound = rangeAxis.getUpperBound();
 
         List<DatasetRow> listSelectedPoints = datasetRows.stream()
-                .filter(datasetRow -> datasetRow.getX() >= xLowerBound && datasetRow.getX() <= xUpperBound &&
-                        datasetRow.getY() >= yLowerBound && datasetRow.getY() <= yUpperBound)
-                .toList();
+            .filter(datasetRow -> datasetRow.getX() >= xLowerBound && datasetRow.getX() <= xUpperBound &&
+                datasetRow.getY() >= yLowerBound && datasetRow.getY() <= yUpperBound)
+            .toList();
         if (ObjectUtils.isNotEmpty(listSelectedPoints)) {
 
             DefaultTableModel model = new DefaultTableModel();
@@ -157,11 +159,11 @@ public class ShowProject extends JFrame implements ActionListener {
     private Map<Long, XYSeries> generateChartData() {
         Map<Long, XYSeries> dataMap = new HashMap<>();
         datasetClasses.forEach(datasetClass ->
-                dataMap.put(datasetClass.getId(), new XYSeries(datasetClass.getName()))
+            dataMap.put(datasetClass.getId(), new XYSeries(datasetClass.getName()))
         );
         datasetRows.forEach(datasetRow ->
-                dataMap.get(datasetRow.getClassId())
-                        .add(datasetRow.getX(), datasetRow.getY())
+            dataMap.get(datasetRow.getClassId())
+                .add(datasetRow.getX(), datasetRow.getY())
         );
         return dataMap;
     }
@@ -190,12 +192,15 @@ public class ShowProject extends JFrame implements ActionListener {
             project.setName(projectName);
             ProjectService dbProjectService = new DBProjectService().createProjectService();
             dbProjectService.save(
-                    datasetClassesByProjectId,
-                    datasetFeaturesByProjectId,
-                    datasetRowsByProjectId,
-                    datasetFeatureRows,
-                    project);
+                datasetClassesByProjectId,
+                datasetFeaturesByProjectId,
+                datasetRowsByProjectId,
+                datasetFeatureRows,
+                project);
         }
+
+        new Homepage();
+        this.dispose();
     }
 
     private void makeFrameSelectedPoints() {

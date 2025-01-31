@@ -41,7 +41,7 @@
         </constraints>
         <properties>
           <enabled value="true"/>
-          <text value="Button"/>
+          <text value="Open Project"/>
           <visible value="true"/>
         </properties>
       </component>

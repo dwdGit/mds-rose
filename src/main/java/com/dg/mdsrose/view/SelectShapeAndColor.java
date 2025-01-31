@@ -14,6 +14,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
@@ -39,10 +41,15 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
         this.setTitle("Select shape and color");
         this.setContentPane(selectShapeAndColorPanel);
         this.setPreferredSize(new Dimension(500, 300));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
         this.confirmButton.addActionListener(this);
 
         this.path = path;
@@ -101,7 +108,7 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
 
         ProjectService projectService = new InMemoryProjectService().createProjectService();
         Long projectId = projectService.save(result.completeDatasetRows(), shapes, selectedColumns);
-        new ShowProject(projectService, projectId);
+        new ShowProject(projectService, projectId, true);
         this.dispose();
     }
 
@@ -110,8 +117,8 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             for (int j = 0; j < colorComponents.size(); j++) {
                 if (
                     i != j &&
-                    Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
-                    Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
+                        Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
+                        Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
                 ) {
                     return true;
                 }

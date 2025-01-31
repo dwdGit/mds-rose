@@ -28,6 +28,7 @@ public class Signup extends JFrame implements ActionListener {
         this.setTitle("Signup");
         this.setContentPane(signupPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setPreferredSize(new Dimension(800, 640));
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
