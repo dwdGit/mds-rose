@@ -5,6 +5,7 @@ import com.dg.mdsrose.project.model.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryProjectDAO implements ProjectDAO {
@@ -30,51 +31,45 @@ public class InMemoryProjectDAO implements ProjectDAO {
     }
 
     @Override
-    public Long insertDatasetClass(Shape shape, Long projectId) {
+    public Long insertDatasetClass(DatasetClass datasetClass) {
         long id = datasetClassesSequence.getAndIncrement();
-        DatasetClass datasetClass = new DatasetClass(
-            id,
-            shape.getLabel(),
-            shape.getMarker().name(),
-            shape.getColor().name(),
-            projectId
-        );
+        datasetClass.setId(id);
         datasetClasses.put(id, datasetClass);
         return id;
     }
 
     @Override
-    public Long insertDatasetFeatures(String name, Long projectId) {
+    public Long insertDatasetFeatures(DatasetFeature datasetFeature) {
         long id = datasetFeaturesSequence.getAndIncrement();
-        DatasetFeature datasetFeature = new DatasetFeature(name, projectId);
+        datasetFeature.setId(id);
         datasetFeatures.put(id, datasetFeature);
         return id;
     }
 
     @Override
-    public Long insertDatasetRow(Long classId, double x, double y, Long projectId) {
+    public Long insertDatasetRow(DatasetRow datasetRow) {
         long id = datasetRowsSequence.getAndIncrement();
-        DatasetRow datasetRow = new DatasetRow(id, classId, x, y, projectId);
+        datasetRow.setId(id);
         datasetRows.put(id, datasetRow);
         return id;
     }
 
     @Override
-    public Long insertDatasetFeatureRow(Long featureId, Long rowId, double value) {
+    public Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow) {
         long id = datasetFeatureRowsSequence.getAndIncrement();
-        DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow(id, featureId, rowId, value);
+        datasetFeatureRow.setId(id);
         datasetFeatureRows.put(id, datasetFeatureRow);
         return id;
     }
 
     @Override
-    public DatasetClass findDatasetClassById(Long id) {
-        return datasetClasses.get(id);
+    public Optional<DatasetClass> findDatasetClassById(Long id) {
+        return Optional.of(datasetClasses.get(id));
     }
 
     @Override
-    public DatasetFeature findDatasetFeatureById(Long id) {
-        return datasetFeatures.get(id);
+    public Optional<DatasetFeature> findDatasetFeatureById(Long id) {
+        return Optional.of(datasetFeatures.get(id));
     }
 
     @Override
@@ -107,5 +102,26 @@ public class InMemoryProjectDAO implements ProjectDAO {
             .stream()
             .filter(datasetFeatureRow -> datasetFeatureRow.getRowId().equals(rowId))
             .toList();
+    }
+
+    @Override
+    public Optional<Project> findProject(Long id) {
+        return Optional.of(projects.get(id));
+    }
+
+    @Override
+    public List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds) {
+        return datasetFeatureRows.values()
+                .stream()
+                .filter(datasetFeatureRow -> rowIds.contains(datasetFeatureRow.getRowId()))
+                .toList();
+    }
+
+    @Override
+    public List<Project> findProjectByUserId(Long id) {
+        return projects.values()
+                .stream()
+                .filter(project -> project.getUserId().equals(id))
+                .toList();
     }
 }

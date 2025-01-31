@@ -7,6 +7,7 @@ import com.dg.mdsrose.user.UserSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ProjectService {
     private final ProjectDAO projectDAO;
@@ -18,7 +19,7 @@ public class ProjectService {
     }
 
     public Long save(
-        List<CompleteDatasetRow> datasetRows,
+        List<CompleteDatasetRow> listCompleteDatasetRows,
         List<Shape> shapes,
         Map<Integer, String> features
     ) {
@@ -27,25 +28,24 @@ public class ProjectService {
         Project project = new Project(userSession.getUserId());
         Long projectId = projectDAO.insertProject(project);
 
-        shapes.forEach(shape ->
-            classIds.put(shape.getLabel(), projectDAO.insertDatasetClass(shape, projectId))
-        );
+        shapes.forEach(shape -> {
+            DatasetClass datasetClass = new DatasetClass(shape.getLabel(), shape.getMarker().name(), shape.getColor().name(), projectId);
+            classIds.put(shape.getLabel(), projectDAO.insertDatasetClass(datasetClass));
+        });
 
         int currIdx = 0;
         for(String name : features.values()) {
-            featureIds.put(currIdx++, projectDAO.insertDatasetFeatures(name, projectId));
+            DatasetFeature datasetFeature = new DatasetFeature(name, projectId);
+            featureIds.put(currIdx++, projectDAO.insertDatasetFeatures(datasetFeature));
         }
 
-        datasetRows.forEach(datasetRow -> {
-            Long rowId = projectDAO.insertDatasetRow(
-                classIds.get(datasetRow.label()),
-                datasetRow.x(),
-                datasetRow.y(),
-                projectId
-            );
+        listCompleteDatasetRows.forEach(completeDatasetRow -> {
+            DatasetRow datasetRow = new DatasetRow(classIds.get(completeDatasetRow.label()), completeDatasetRow.x(), completeDatasetRow.y(), projectId);
+            Long rowId = projectDAO.insertDatasetRow(datasetRow);
 
-            for(int i = 0; i < datasetRow.features().length; i++) {
-                projectDAO.insertDatasetFeatureRow(featureIds.get(i), rowId, datasetRow.features()[i]);
+            for(int i = 0; i < completeDatasetRow.features().length; i++) {
+                DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow(featureIds.get(i), rowId, completeDatasetRow.features()[i]);
+                projectDAO.insertDatasetFeatureRow(datasetFeatureRow);
             }
         });
 
@@ -68,7 +68,52 @@ public class ProjectService {
         return projectDAO.findDatasetFeatureRowsByRowId(rowId);
     }
 
-    public DatasetClass findDatasetClassById(Long id) {
+    public Optional<DatasetClass> findDatasetClassById(Long id) {
         return projectDAO.findDatasetClassById(id);
+    }
+
+    public Optional<Project> findProject(Long id) {
+        return projectDAO.findProject(id);
+    }
+
+    public List<Project> findProjectByUserId(Long id) {
+        return projectDAO.findProjectByUserId(id);
+    }
+
+    public void save(List<DatasetClass> datasetClasses,
+                     List<DatasetFeature> datasetFeatures,
+                     List<DatasetRow> datasetRows,
+                     List<DatasetFeatureRow> datasetFeatureRows,
+                     Project project) {
+        Map<Long, Long> classIds = new HashMap<>();
+        Map<Long, Long> featureIds = new HashMap<>();
+        Map<Long, Long> rowsIds = new HashMap<>();
+
+        Long projectId = projectDAO.insertProject(project);
+        datasetClasses.forEach(datasetClass -> {
+            datasetClass.setProjectId(projectId);
+            Long idDatasetClass = projectDAO.insertDatasetClass(datasetClass);
+            classIds.put(datasetClass.getId(),idDatasetClass);
+        });
+        datasetFeatures.forEach(datasetFeature -> {
+            datasetFeature.setProjectId(projectId);
+            Long idDatasetFeature = projectDAO.insertDatasetFeatures(datasetFeature);
+            featureIds.put(datasetFeature.getId(),idDatasetFeature);
+        });
+        datasetRows.forEach(datasetRow -> {
+            datasetRow.setProjectId(projectId);
+            datasetRow.setClassId(classIds.get(datasetRow.getClassId()));
+            Long idDatasetRow = projectDAO.insertDatasetRow(datasetRow);
+            rowsIds.put(datasetRow.getId(),idDatasetRow);
+        });
+        datasetFeatureRows.forEach(datasetFeatureRow -> {
+            datasetFeatureRow.setRowId(rowsIds.get(datasetFeatureRow.getRowId()));
+            datasetFeatureRow.setFeatureId(featureIds.get(datasetFeatureRow.getFeatureId()));
+            projectDAO.insertDatasetFeatureRow(datasetFeatureRow);
+        });
+    }
+
+    public List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds) {
+        return projectDAO.findDatasetFeatureRowsByRowIds(rowIds);
     }
 }

@@ -1,14 +1,24 @@
 package com.dg.mdsrose.view;
 
+import com.dg.mdsrose.project.DBProjectDAO;
+import com.dg.mdsrose.project.DBProjectService;
+import com.dg.mdsrose.project.ProjectService;
+import com.dg.mdsrose.project.model.Project;
+import com.dg.mdsrose.user.UserSession;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+import java.util.Objects;
 
 public class Homepage extends JFrame implements ActionListener {
     private JLabel yourProjectsLabel;
     private JPanel homepagePanel;
     private JButton newProjectButton;
+    private JList projectList;
+    private JButton openProjectButton;
 
     public Homepage() {
         this.setTitle("Homepage");
@@ -17,14 +27,37 @@ public class Homepage extends JFrame implements ActionListener {
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
+        getProjects();
         newProjectButton.addActionListener(this);
+        openProjectButton.addActionListener(this);
+    }
+
+    private void getProjects() {
+        UserSession instance = UserSession.getInstance();
+        DBProjectDAO dao = new DBProjectDAO();
+        ProjectService projectService = new ProjectService(dao);
+        List<Project> projects = projectService.findProjectByUserId(instance.getUserId());
+        projectList.setListData(projects.toArray());
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(this.newProjectButton)) {
             goToNewProject();
+        } else if (e.getSource().equals(this.openProjectButton)) {
+            openProject();
         }
+    }
+
+    private void openProject() {
+        Project selectedProject = (Project) projectList.getSelectedValue();
+        if (Objects.isNull(selectedProject)) {
+            //todo error select project
+        }
+        ProjectService projectService = new DBProjectService().createProjectService();
+        new ShowProject(projectService, selectedProject.getId());
+        this.dispose();
     }
 
     private void goToNewProject() {
@@ -48,19 +81,22 @@ public class Homepage extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         homepagePanel = new JPanel();
-        homepagePanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 4, new Insets(10, 10, 10, 10), -1, -1));
+        homepagePanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
         yourProjectsLabel = new JLabel();
         yourProjectsLabel.setText("Your projects");
-        homepagePanel.add(yourProjectsLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-        homepagePanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
-        homepagePanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        homepagePanel.add(yourProjectsLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         newProjectButton = new JButton();
         newProjectButton.setText("New project");
-        homepagePanel.add(newProjectButton, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer3 = new com.intellij.uiDesigner.core.Spacer();
-        homepagePanel.add(spacer3, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        homepagePanel.add(newProjectButton, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        projectList = new JList();
+        projectList.setEnabled(true);
+        projectList.setVisible(true);
+        homepagePanel.add(projectList, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        openProjectButton = new JButton();
+        openProjectButton.setEnabled(true);
+        openProjectButton.setText("Button");
+        openProjectButton.setVisible(true);
+        homepagePanel.add(openProjectButton, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

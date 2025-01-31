@@ -17,6 +17,8 @@ public class Project {
         this.userId = userId;
     }
 
+    public Project() {}
+
     public Long getId() {
         return id;
     }

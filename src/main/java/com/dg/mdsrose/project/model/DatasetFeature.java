@@ -5,13 +5,11 @@ import java.util.Objects;
 public class DatasetFeature {
     private Long id;
     private String name;
-    private Double value;
     private Long projectId;
 
-    public DatasetFeature(Long id, String name, Double value, Long projectId) {
+    public DatasetFeature(Long id, String name, Long projectId) {
         this.id = id;
         this.name = name;
-        this.value = value;
         this.projectId = projectId;
     }
 
@@ -36,14 +34,6 @@ public class DatasetFeature {
         this.name = name;
     }
 
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
     public Long getProjectId() {
         return projectId;
     }
@@ -57,7 +47,6 @@ public class DatasetFeature {
         return "DatasetFeature{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", value=" + value +
             ", projectId=" + projectId +
             '}';
     }

@@ -2,7 +2,7 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.enums.ColorOption;
 import com.dg.mdsrose.enums.MarkerOption;
-import com.dg.mdsrose.project.InMemoryProjectViewer;
+import com.dg.mdsrose.project.InMemoryProjectService;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
 import com.dg.mdsrose.project.builder.SelectedShape;
@@ -23,7 +23,7 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
     private JButton confirmButton;
     private JPanel classesPanel;
 
-    private final ProjectService projectService = ProjectService.getInstance();
+
     private final String[] colors = {ColorOption.BLUE.getValue(), ColorOption.GREEN.getValue(), ColorOption.RED.getValue(), ColorOption.BLACK.getValue(), ColorOption.YELLOW.getValue()};
     private final String[] markers = {MarkerOption.CIRCLE.getValue(), MarkerOption.SQUARE.getValue(), MarkerOption.TRIANGLE_UP.getValue(), MarkerOption.TRIANGLE_DOWN.getValue(), MarkerOption.DIAMOND.getValue()};
     private final String path;
@@ -99,9 +99,9 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
             .map(SelectShapeAndColor::mapShape)
             .toList();
 
+        ProjectService projectService = new InMemoryProjectService().createProjectService();
         Long projectId = projectService.save(result.completeDatasetRows(), shapes, selectedColumns);
-        new InMemoryProjectViewer()
-            .retrieveProject(projectId);
+        new ShowProject(projectService, projectId);
         this.dispose();
     }
 

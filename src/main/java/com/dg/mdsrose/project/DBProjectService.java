@@ -1,6 +1,6 @@
 package com.dg.mdsrose.project;
 
-public class DBProjectViewer extends ProjectViewer {
+public class DBProjectService extends ProjectServiceFactory {
     @Override
     public ProjectDAO getProjectDAO() {
         return new DBProjectDAO();

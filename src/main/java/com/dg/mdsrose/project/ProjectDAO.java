@@ -3,21 +3,22 @@ package com.dg.mdsrose.project;
 import com.dg.mdsrose.project.model.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectDAO {
     Long insertProject(Project project);
 
-    Long insertDatasetClass(Shape shape, Long projectId);
+    Long insertDatasetClass(DatasetClass datasetClass);
 
-    Long insertDatasetFeatures(String name, Long projectId);
+    Long insertDatasetFeatures(DatasetFeature datasetFeature);
 
-    Long insertDatasetRow(Long classId, double x, double y, Long projectId);
+    Long insertDatasetRow(DatasetRow datasetRow);
 
-    Long insertDatasetFeatureRow(Long featureId, Long rowId, double value);
+    Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow);
 
-    DatasetClass findDatasetClassById(Long id);
+    Optional<DatasetClass> findDatasetClassById(Long id);
 
-    DatasetFeature findDatasetFeatureById(Long id);
+    Optional<DatasetFeature> findDatasetFeatureById(Long id);
 
     List<DatasetClass> findDatasetClassesByProjectId(Long projectId);
 
@@ -26,4 +27,10 @@ public interface ProjectDAO {
     List<DatasetFeature> findDatasetFeaturesByProjectId(Long projectId);
 
     List<DatasetFeatureRow> findDatasetFeatureRowsByRowId(Long rowId);
+
+    Optional<Project> findProject(Long id);
+
+    List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds);
+
+    List<Project> findProjectByUserId(Long id);
 }

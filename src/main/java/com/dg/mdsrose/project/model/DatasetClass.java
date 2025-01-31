@@ -9,6 +9,13 @@ public class DatasetClass {
     private String color;
     private Long projectId;
 
+    public DatasetClass(String name, String marker, String color, Long projectId) {
+        this.name = name;
+        this.marker = marker;
+        this.color = color;
+        this.projectId = projectId;
+    }
+
     public DatasetClass(Long id, String name, String marker, String color, Long projectId) {
         this.id = id;
         this.name = name;
