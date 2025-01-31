@@ -1,14 +1,16 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.dataset.CsvStrategy;
-import com.dg.mdsrose.dataset.DataStrategy;
-import com.dg.mdsrose.dataset.DatasetStrategy;
+import com.dg.mdsrose.project.dataset.CsvStrategy;
+import com.dg.mdsrose.project.dataset.DataStrategy;
+import com.dg.mdsrose.project.dataset.DatasetStrategy;
 import com.dg.mdsrose.util.DatasetFileFilter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Objects;
 
@@ -24,10 +26,15 @@ public class ProjectCreation extends JFrame implements ActionListener {
     public ProjectCreation() {
         this.setTitle("New Project");
         this.setContentPane(newProjectPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
         selectDatasetButton.addActionListener(this);
         confirmButton.addActionListener(this);
     }
@@ -43,16 +50,16 @@ public class ProjectCreation extends JFrame implements ActionListener {
 
     private void confirmFile() {
         DatasetStrategy datasetStrategy;
-        if(pathDatasetField.getText().endsWith(".data")) {
+        if (pathDatasetField.getText().endsWith(".data")) {
             datasetStrategy = new DataStrategy();
-        } else if(pathDatasetField.getText().endsWith(".csv")){
+        } else if (pathDatasetField.getText().endsWith(".csv")) {
             datasetStrategy = new CsvStrategy();
         } else {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Select a valid dataset.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Select a valid dataset.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }

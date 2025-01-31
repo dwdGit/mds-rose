@@ -2,14 +2,16 @@ package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.util.DataDataset;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
-import java.util.List;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class DataSelectColumn extends JFrame implements ActionListener {
 
@@ -19,8 +21,9 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JLabel columnLabel;
     private JButton generateRowButton;
     private JPanel rowPanel;
-    private Map<Integer,String> selectedColumns = new HashMap<>();
 
+    private final Map<Integer, String> selectedColumns = new HashMap<>();
+    private final String path;
     private final String prefixIndexColumnInputField = "numberColumn";
     private final String prefixNameColumnInputField = "nameColumn";
     private final Integer numColumnsDataset;
@@ -29,14 +32,20 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     public DataSelectColumn(String path) {
         this.setTitle("Select Column");
         this.setContentPane(dataSelectColumnPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(490, 300));
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setPreferredSize(new Dimension(800, 640));
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
         generateRowButton.addActionListener(this);
         confirmButton.addActionListener(this);
 
+        this.path = path;
         DataDataset dataDataset = new DataDataset(path);
         numColumnsDataset = dataDataset.getNumberOfColumns();
     }
@@ -54,10 +63,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         checkInputField();
         if (!rowGenerated) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "First generate rows.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "First generate rows.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
@@ -68,51 +77,53 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         String nameColumn = null;
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if(textField.getName().startsWith(prefixIndexColumnInputField)) {
+                if (textField.getName().startsWith(prefixIndexColumnInputField)) {
                     numColumn = Integer.parseInt(textField.getText());
                 }
-                if(textField.getName().startsWith(prefixNameColumnInputField)) {
+                if (textField.getName().startsWith(prefixNameColumnInputField)) {
                     nameColumn = textField.getText();
                 }
-                if(Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
+                if (Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
                     selectedColumns.put(numColumn, nameColumn);
                     numColumn = null;
                     nameColumn = null;
                 }
             }
         }
-        System.out.println(selectedColumns);
+
+        new SelectShapeAndColor(this.path, selectedColumns);
+        this.dispose();
     }
 
     private void checkInputField() {
         Component[] components = rowPanel.getComponents();
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if(checkInputAreEmpty(textField)){
+                if (checkInputAreEmpty(textField)) {
                     JOptionPane.showMessageDialog(
-                            this,
-                            "Fill all rows.",
-                            "Error",
-                            JOptionPane.ERROR_MESSAGE
+                        this,
+                        "Fill all rows.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
                     );
                     return;
                 }
                 if (checkNumericField(textField)) {
-                    if(!checkDigitInputFieldNumericColumn(textField)){
+                    if (!checkDigitInputFieldNumericColumn(textField)) {
                         JOptionPane.showMessageDialog(
-                                this,
-                                "You must enter a numeric value.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
+                            this,
+                            "You must enter a numeric value.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                         );
                         return;
                     }
-                    if(checkInputFieldMaxColumn(textField)){
+                    if (checkInputFieldMaxColumn(textField)) {
                         JOptionPane.showMessageDialog(
-                                this,
-                                "Overflow max column.",
-                                "Error",
-                                JOptionPane.ERROR_MESSAGE
+                            this,
+                            "Overflow max column.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
                         );
                         return;
                     }
@@ -140,19 +151,19 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private void generateRow() {
         if (!validateNumberColumns()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid number.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Invalid number.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
-        if(!checkMaxNumColumn()){
+        if (!checkMaxNumColumn()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid number.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Invalid number.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
@@ -161,10 +172,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
-            numColField.setName(prefixIndexColumnInputField+i);
+            numColField.setName(prefixIndexColumnInputField + i);
             JLabel numColLabel = new JLabel(".");
             JTextField nameColField = new JTextField(0);
-            nameColField.setName(prefixNameColumnInputField+i);
+            nameColField.setName(prefixNameColumnInputField + i);
             rowPanel.add(numColField);
             rowPanel.add(numColLabel);
             rowPanel.add(nameColField);

@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,21 +16,26 @@ import java.util.Optional;
 
 public class CsvSelectColumn extends JFrame implements ActionListener {
     private JPanel selectColumnPanel;
-    private JList columnList;
+    private JList<String> columnList;
     private JButton confirmButton;
 
     private final String path;
-    private Map<Integer, String> selectedColumns = new HashMap<>();
-    private List<Pair<Integer,String>> csvColumns;
+    private final Map<Integer, String> selectedColumns = new HashMap<>();
+    private List<Pair<Integer, String>> csvColumns;
 
     public CsvSelectColumn(String path) {
         this.setTitle("Select Column");
         this.setContentPane(selectColumnPanel);
-        this.setPreferredSize(new Dimension(300, 300));
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setPreferredSize(new Dimension(800, 640));
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
         this.columnList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         this.path = path;
@@ -38,47 +45,47 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
 
     private void populateList() {
         CsvDataset csvDataset = new CsvDataset(path);
-        Optional<List<Pair<Integer,String>>> optionalCsvColumns = csvDataset.getColumns();
-        if(optionalCsvColumns.isEmpty()) {
+        Optional<List<Pair<Integer, String>>> optionalCsvColumns = csvDataset.getColumns();
+        if (optionalCsvColumns.isEmpty()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Error read columns from dataset.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Error read columns from dataset.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
         DefaultListModel<String> listModel = new DefaultListModel<>();
         csvColumns = optionalCsvColumns.get();
-        csvColumns.forEach(pair -> {
-            listModel.addElement(pair.getRight());
-        });
+        csvColumns.forEach(pair -> listModel.addElement(pair.getRight()));
         columnList.setModel(listModel);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == confirmButton) {
+        if (e.getSource() == confirmButton) {
             confirmColumns();
         }
     }
 
     private void confirmColumns() {
-        if(checkIfColumnSelected()){
+        if (checkIfColumnSelected()) {
             JOptionPane.showMessageDialog(
-                    this,
-                    "Select at least one column.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
+                this,
+                "Select at least one column.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
             );
             return;
         }
         List<String> selectedValuesList = columnList.getSelectedValuesList();
         csvColumns.forEach(pair -> {
-            if(selectedValuesList.contains(pair.getRight())) {
-                selectedColumns.put(pair.getLeft(), pair.getRight());
+            if (selectedValuesList.contains(pair.getRight())) {
+                selectedColumns.put(pair.getLeft() + 1, pair.getRight());
             }
         });
+        new SelectShapeAndColor(this.path, selectedColumns);
+        this.dispose();
     }
 
     private boolean checkIfColumnSelected() {

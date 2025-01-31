@@ -2,6 +2,7 @@ package com.dg.mdsrose.user;
 
 import com.dg.mdsrose.db.DB;
 import com.dg.mdsrose.enums.DBTable;
+import com.dg.mdsrose.user.model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

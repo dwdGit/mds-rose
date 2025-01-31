@@ -1,5 +1,7 @@
 package com.dg.mdsrose.user;
 
+import com.dg.mdsrose.user.model.User;
+
 public class UserSession {
     private static UserSession instance;
     private Long userId;

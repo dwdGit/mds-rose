@@ -1,6 +1,7 @@
 package com.dg.mdsrose.user;
 
 import com.dg.mdsrose.exception.UserAlreadyExistsException;
+import com.dg.mdsrose.user.model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Optional;
