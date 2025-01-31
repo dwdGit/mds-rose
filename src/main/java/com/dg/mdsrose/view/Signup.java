@@ -1,6 +1,6 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.exception.UserAlreadyExistsException;
+import com.dg.mdsrose.user.exception.UserAlreadyExistsException;
 import com.dg.mdsrose.user.UserService;
 
 import javax.swing.*;

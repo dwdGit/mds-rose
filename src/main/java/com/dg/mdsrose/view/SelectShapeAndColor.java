@@ -7,7 +7,9 @@ import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
 import com.dg.mdsrose.project.builder.SelectedShape;
 import com.dg.mdsrose.project.model.Shape;
+import com.dg.mdsrose.project.processor.CSVFileProcessor;
 import com.dg.mdsrose.project.processor.DataFileProcessor;
+import com.dg.mdsrose.project.processor.FileProcessor;
 import com.dg.mdsrose.project.processor.FileProcessorResult;
 
 import javax.swing.*;
@@ -59,8 +61,13 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
 
     private void generateDatasetClass() {
         try {
-            DataFileProcessor dataFileProcessor = new DataFileProcessor(path, selectedColumns);
-            result = dataFileProcessor.process();
+            FileProcessor fileProcessor;
+            if (path.endsWith(".data")) {
+                fileProcessor = new DataFileProcessor(path, selectedColumns);
+            } else {
+                fileProcessor = new CSVFileProcessor(path, selectedColumns);
+            }
+            result = fileProcessor.process();
             List<String> datasetClasses = result.classes();
             numClasses = datasetClasses.size();
             classesPanel.setLayout(new GridLayout(numClasses, 3, 10, 10));

@@ -1,4 +1,4 @@
-package com.dg.mdsrose.exception;
+package com.dg.mdsrose.user.exception;
 
 public class UserAlreadyExistsException extends RuntimeException {
     public UserAlreadyExistsException(String username) {
