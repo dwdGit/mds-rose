@@ -25,9 +25,9 @@ public enum MarkerOption {
         return shape;
     }
 
-    public static MarkerOption from(String marker) {
+    public static MarkerOption from(String value) {
         for (MarkerOption shape : MarkerOption.values()) {
-            if (shape.getValue().equals(marker)) {
+            if (shape.getValue().equals(value)) {
                 return shape;
             }
         }

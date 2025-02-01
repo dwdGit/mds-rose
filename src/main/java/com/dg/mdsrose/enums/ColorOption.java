@@ -25,9 +25,9 @@ public enum ColorOption {
         return color;
     }
 
-    public static ColorOption from(String colorValue) {
+    public static ColorOption from(String value) {
         for (ColorOption color : ColorOption.values()) {
-            if (color.getValue().equals(colorValue)) {
+            if (color.getValue().equals(value)) {
                 return color;
             }
         }

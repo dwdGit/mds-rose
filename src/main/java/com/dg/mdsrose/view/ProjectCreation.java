@@ -4,12 +4,12 @@ import com.dg.mdsrose.project.InMemoryProjectService;
 import com.dg.mdsrose.project.dataset.CsvStrategy;
 import com.dg.mdsrose.project.dataset.DataStrategy;
 import com.dg.mdsrose.project.dataset.DatasetStrategy;
-import com.dg.mdsrose.util.DatasetFileFilter;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +28,20 @@ public class ProjectCreation extends BaseJFrame implements ActionListener {
     private JPanel newProjectPanel;
     private JButton confirmButton;
 
+    private static class DatasetFileFilter extends FileFilter {
+        @Override
+        public boolean accept(File f) {
+            if (f.isDirectory()) {
+                return true;
+            }
+            return f.isFile() && (f.getName().endsWith(".data") || f.getName().endsWith(".csv"));
+        }
+
+        @Override
+        public String getDescription() {
+            return "DATA file (.csv, .data)";
+        }
+    }
 
     public ProjectCreation() {
         createAndShowGUI();
