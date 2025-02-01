@@ -28,4 +28,12 @@ public class ConcreteShapeBuilder implements ShapeBuilder {
     public Shape getResult() {
         return new Shape(color,marker,label);
     }
+
+    public static ConcreteShapeBuilder of(String label, ColorOption color, MarkerOption marker) {
+        ConcreteShapeBuilder concreteShapeBuilder = new ConcreteShapeBuilder();
+        concreteShapeBuilder.setLabel(label);
+        concreteShapeBuilder.setColor(color);
+        concreteShapeBuilder.setMarker(marker);
+        return concreteShapeBuilder;
+    }
 }

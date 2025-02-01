@@ -116,4 +116,8 @@ public class ProjectService {
     public List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds) {
         return projectDAO.findDatasetFeatureRowsByRowIds(rowIds);
     }
+
+    public boolean projectExistsByName(String name) {
+        return projectDAO.projectExistsByName(name);
+    }
 }

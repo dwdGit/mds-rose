@@ -1,6 +1,8 @@
 package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.util.CsvDataset;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
@@ -39,7 +41,7 @@ public class CsvSelectColumn extends BaseJFrame implements ActionListener {
 
     @Override
     protected String setTitle() {
-        return "Select Column";
+        return "CSV file column selection";
     }
 
     @Override
@@ -112,12 +114,12 @@ public class CsvSelectColumn extends BaseJFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         selectColumnPanel = new JPanel();
-        selectColumnPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
+        selectColumnPanel.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         columnList = new JList();
-        selectColumnPanel.add(columnList, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        selectColumnPanel.add(columnList, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
         confirmButton = new JButton();
         confirmButton.setText("Confirm");
-        selectColumnPanel.add(confirmButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        selectColumnPanel.add(confirmButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -126,4 +128,5 @@ public class CsvSelectColumn extends BaseJFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return selectColumnPanel;
     }
+
 }

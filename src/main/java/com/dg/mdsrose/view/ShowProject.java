@@ -5,6 +5,8 @@ import com.dg.mdsrose.enums.MarkerOption;
 import com.dg.mdsrose.project.DBProjectService;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.model.*;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -84,7 +86,7 @@ public class ShowProject extends BaseJFrame implements ActionListener {
 
         // Create chart
         JFreeChart chart = ChartFactory.createXYLineChart(
-            "MDS Graph",
+            "MDS Chart",
             "X",
             "Y",
             dataset,
@@ -108,6 +110,10 @@ public class ShowProject extends BaseJFrame implements ActionListener {
         }
         chart.getXYPlot().setRenderer(renderer);
 
+        chartContainerPanel.add(buildChartPanel(chart));
+    }
+
+    private ChartPanel buildChartPanel(JFreeChart chart) {
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setFillZoomRectangle(true);
 
@@ -121,8 +127,7 @@ public class ShowProject extends BaseJFrame implements ActionListener {
                 showPointsButton.setEnabled(true);
             }
         });
-
-        chartContainerPanel.add(chartPanel);
+        return chartPanel;
     }
 
     private void getPointSpotlight(ValueAxis domainAxis, ValueAxis rangeAxis) {
@@ -183,7 +188,17 @@ public class ShowProject extends BaseJFrame implements ActionListener {
     }
 
     private void saveProject() {
+        ProjectService dbProjectService = new DBProjectService().createProjectService();
         String projectName = JOptionPane.showInputDialog(this, "Insert a project's name");
+        if (dbProjectService.projectExistsByName(projectName)) {
+            JOptionPane.showMessageDialog(
+                this,
+                String.format("Project with name `%s` already exists!", projectName),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
 
         List<DatasetClass> datasetClassesByProjectId = projectService.findDatasetClassesByProjectId(projectId);
         List<DatasetFeature> datasetFeaturesByProjectId = projectService.findDatasetFeaturesByProjectId(projectId);
@@ -195,7 +210,6 @@ public class ShowProject extends BaseJFrame implements ActionListener {
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
             project.setName(projectName);
-            ProjectService dbProjectService = new DBProjectService().createProjectService();
             dbProjectService.save(
                 datasetClassesByProjectId,
                 datasetFeaturesByProjectId,
@@ -239,18 +253,18 @@ public class ShowProject extends BaseJFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         showProjectPanel = new JPanel();
-        showProjectPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 2, new Insets(10, 10, 10, 10), -1, -1));
+        showProjectPanel.setLayout(new GridLayoutManager(2, 2, new Insets(10, 10, 10, 10), -1, -1));
         chartContainerPanel = new JPanel();
-        chartContainerPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        showProjectPanel.add(chartContainerPanel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        chartContainerPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        showProjectPanel.add(chartContainerPanel, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         showPointsButton = new JButton();
         showPointsButton.setEnabled(false);
         showPointsButton.setText("Show selected points");
         showPointsButton.setVisible(false);
-        showProjectPanel.add(showPointsButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
+        showProjectPanel.add(showPointsButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, 1, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
         saveButton = new JButton();
         saveButton.setText("Save");
-        showProjectPanel.add(saveButton, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        showProjectPanel.add(saveButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -259,4 +273,5 @@ public class ShowProject extends BaseJFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return showProjectPanel;
     }
+
 }

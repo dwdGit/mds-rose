@@ -54,7 +54,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)
         ){
             preparedStatement.setString(1,datasetClass.getName());
             preparedStatement.setString(2,datasetClass.getMarker());
@@ -88,7 +88,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)
         ){
             preparedStatement.setString(1, datasetFeature.getName());
             preparedStatement.setLong(2, datasetFeature.getProjectId());
@@ -120,7 +120,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)
         ){
             preparedStatement.setLong(1, datasetRow.getClassId());
             preparedStatement.setDouble(2, datasetRow.getX());
@@ -154,7 +154,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)
         ){
             preparedStatement.setLong(1, datasetFeatureRow.getRowId());
             preparedStatement.setLong(2, datasetFeatureRow.getFeatureId());
@@ -187,7 +187,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -223,7 +223,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -257,7 +257,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
             Connection connection = DB.createConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, projectId);
             resultSet = preparedStatement.executeQuery();
@@ -294,7 +294,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, projectId);
             resultSet = preparedStatement.executeQuery();
@@ -331,7 +331,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, projectId);
             resultSet = preparedStatement.executeQuery();
@@ -366,7 +366,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, rowId);
             resultSet = preparedStatement.executeQuery();
@@ -401,7 +401,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -426,7 +426,7 @@ public class DBProjectDAO implements ProjectDAO {
 
     @Override
     public List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds) {
-        String placeholders = String.join(", ", rowIds.stream().map(id -> "?").toArray(String[]::new));
+        String placeholders = String.join(", ", rowIds.stream().map(_ -> "?").toArray(String[]::new));
 
         String sql = new StringJoiner(" ")
                 .add("SELECT dataset_row_id, dataset_feature_id, value FROM")
@@ -437,7 +437,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             for (int i = 0; i < rowIds.size(); i++) {
                 preparedStatement.setLong(i + 1, rowIds.get(i));
@@ -474,7 +474,7 @@ public class DBProjectDAO implements ProjectDAO {
         ResultSet resultSet = null;
         try(
                 Connection connection = DB.createConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)
         ){
             preparedStatement.setLong(1, id);
             resultSet = preparedStatement.executeQuery();
@@ -496,5 +496,37 @@ public class DBProjectDAO implements ProjectDAO {
                 } catch (SQLException _) {}
             }
         }
+    }
+
+    @Override
+    public boolean projectExistsByName(String name) {
+        String sql = new StringJoiner(" ")
+            .add("SELECT 1 FROM")
+            .add(DBTable.PROJECT.getValue())
+            .add("WHERE name = ?")
+            .toString();
+
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = DB.createConnection();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()) return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if(resultSet != null) resultSet.close();
+                if(preparedStatement != null) preparedStatement.close();
+                if(connection != null) connection.close();
+            } catch (SQLException _) {}
+        }
+
+        return false;
     }
 }

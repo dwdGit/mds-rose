@@ -11,6 +11,8 @@ import com.dg.mdsrose.project.processor.CSVFileProcessor;
 import com.dg.mdsrose.project.processor.DataFileProcessor;
 import com.dg.mdsrose.project.processor.FileProcessor;
 import com.dg.mdsrose.project.processor.FileProcessorResult;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,8 +33,6 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     private JPanel classesPanel;
 
 
-    private final String[] colors = {ColorOption.BLUE.getValue(), ColorOption.GREEN.getValue(), ColorOption.RED.getValue(), ColorOption.BLACK.getValue(), ColorOption.YELLOW.getValue()};
-    private final String[] markers = {MarkerOption.CIRCLE.getValue(), MarkerOption.SQUARE.getValue(), MarkerOption.TRIANGLE_UP.getValue(), MarkerOption.TRIANGLE_DOWN.getValue(), MarkerOption.DIAMOND.getValue()};
     private final String path;
     private final List<JComboBox<String>> colorComponents = new ArrayList<>();
     private final List<JComboBox<String>> markerComponents = new ArrayList<>();
@@ -92,8 +92,8 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
             numClasses = datasetClasses.size();
             classesPanel.setLayout(new GridLayout(numClasses, 3, 10, 10));
             for (String datasetClass : datasetClasses) {
-                JComboBox<String> colorClassComboBox = new JComboBox<>(colors);
-                JComboBox<String> markerClassComboBox = new JComboBox<>(markers);
+                JComboBox<String> colorClassComboBox = new JComboBox<>(ColorOption.comboBoxOptions());
+                JComboBox<String> markerClassComboBox = new JComboBox<>(MarkerOption.comboBoxOptions());
                 JLabel jLabel = new JLabel(datasetClass);
                 classesPanel.add(colorClassComboBox);
                 classesPanel.add(markerClassComboBox);
@@ -128,9 +128,16 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
             return;
         }
 
-        List<SelectedShape> selectedShapes = getShapeClasses();
+        List<SelectedShape> selectedShapes = getSelectedShapes();
         List<Shape> shapes = selectedShapes.stream()
-            .map(SelectShapeAndColor::mapShape)
+            .map(selectedShape ->
+                ConcreteShapeBuilder.of(
+                    selectedShape.getLabel(),
+                    ColorOption.from(selectedShape.getColor()),
+                    MarkerOption.from(selectedShape.getMarker())
+                )
+            )
+            .map(ConcreteShapeBuilder::getResult)
             .toList();
 
         ProjectService projectService = new InMemoryProjectService().createProjectService();
@@ -142,27 +149,19 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     private boolean checkDuplicatedInputs() {
         for (int i = 0; i < colorComponents.size(); i++) {
             for (int j = 0; j < colorComponents.size(); j++) {
-                if (
-                    i != j &&
-                        Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
-                        Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem())
-                ) {
-                    return true;
-                }
+                if (haveSameShapeAndColor(i, j)) return true;
             }
         }
         return false;
     }
 
-    private static Shape mapShape(SelectedShape selectedShape) {
-        ConcreteShapeBuilder shapeBuilder = new ConcreteShapeBuilder();
-        shapeBuilder.setColor(ColorOption.from(selectedShape.getColor()));
-        shapeBuilder.setMarker(MarkerOption.from(selectedShape.getMarker()));
-        shapeBuilder.setLabel(selectedShape.getLabel());
-        return shapeBuilder.getResult();
+    private boolean haveSameShapeAndColor(int i, int j) {
+        return i != j &&
+            Objects.equals(colorComponents.get(i).getSelectedItem(), colorComponents.get(j).getSelectedItem()) &&
+            Objects.equals(markerComponents.get(i).getSelectedItem(), markerComponents.get(j).getSelectedItem());
     }
 
-    private List<SelectedShape> getShapeClasses() {
+    private List<SelectedShape> getSelectedShapes() {
         List<SelectedShape> selectedShapes = new ArrayList<>();
         for (int i = 0; i < numClasses; i++) {
             SelectedShape selectedShape = new SelectedShape();
@@ -190,13 +189,13 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         selectShapeAndColorPanel = new JPanel();
-        selectShapeAndColorPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
+        selectShapeAndColorPanel.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         confirmButton = new JButton();
         confirmButton.setText("Confirm");
-        selectShapeAndColorPanel.add(confirmButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        selectShapeAndColorPanel.add(confirmButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         classesPanel = new JPanel();
-        classesPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        selectShapeAndColorPanel.add(classesPanel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        classesPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        selectShapeAndColorPanel.add(classesPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**
@@ -205,4 +204,5 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return selectShapeAndColorPanel;
     }
+
 }

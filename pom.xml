@@ -28,6 +28,15 @@
       <systemPath>${pom.basedir}/lib/mdsj.jar</systemPath>
     </dependency>
 
+    <!-- INTELLIJ FORM DESIGNER -->
+    <dependency>
+      <groupId>com.intellij</groupId>
+      <artifactId>forms_rt</artifactId>
+      <version>1.0</version>
+      <scope>system</scope>
+      <systemPath>${pom.basedir}/lib/forms_rt.jar</systemPath>
+    </dependency>
+
     <!-- DATABASE -->
     <dependency>
       <groupId>org.xerial</groupId>

@@ -18,7 +18,6 @@ import static com.dg.mdsrose.enums.FileMetadata.CSV;
 import static com.dg.mdsrose.enums.FileMetadata.DATA;
 
 public class ProjectCreation extends BaseJFrame implements ActionListener {
-
     private JTextField pathDatasetField;
     private JButton selectDatasetButton;
     private JLabel selectDatasetLabel;

@@ -33,4 +33,6 @@ public interface ProjectDAO {
     List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds);
 
     List<Project> findProjectByUserId(Long id);
+
+    boolean projectExistsByName(String name);
 }

@@ -33,4 +33,13 @@ public enum MarkerOption {
         }
         return null;
     }
+
+    public static String[] comboBoxOptions() {
+        String[] options = new String[MarkerOption.values().length];
+        MarkerOption[] values = MarkerOption.values();
+        for(int i=0; i<values.length; i++) {
+            options[i] = values[i].getValue();
+        }
+        return options;
+    }
 }

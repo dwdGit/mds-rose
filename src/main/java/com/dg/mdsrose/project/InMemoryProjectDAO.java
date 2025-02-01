@@ -124,4 +124,11 @@ public class InMemoryProjectDAO implements ProjectDAO {
                 .filter(project -> project.getUserId().equals(id))
                 .toList();
     }
+
+    @Override
+    public boolean projectExistsByName(String name) {
+        return projects.values()
+            .stream()
+            .anyMatch(project -> project.getName().equals(name));
+    }
 }

@@ -33,4 +33,13 @@ public enum ColorOption {
         }
         return null;
     }
+
+    public static String[] comboBoxOptions() {
+        String[] options = new String[ColorOption.values().length];
+        ColorOption[] values = ColorOption.values();
+        for(int i = 0; i < values.length; i++) {
+            options[i] = values[i].getValue();
+        }
+        return options;
+    }
 }
