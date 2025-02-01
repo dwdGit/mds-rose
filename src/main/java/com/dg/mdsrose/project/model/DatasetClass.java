@@ -18,6 +18,10 @@ public class DatasetClass {
         this.projectId = projectId;
     }
 
+    public DatasetClass(String name) {
+        this.name = name;
+    }
+
     public DatasetClass(Long id, String name, String marker, String color, Long projectId) {
         this.id = id;
         this.name = name;

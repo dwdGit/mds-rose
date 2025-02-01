@@ -6,11 +6,8 @@ import com.dg.mdsrose.project.InMemoryProjectService;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
 import com.dg.mdsrose.project.builder.SelectedShape;
+import com.dg.mdsrose.project.model.DatasetClass;
 import com.dg.mdsrose.project.model.Shape;
-import com.dg.mdsrose.project.processor.CSVFileProcessor;
-import com.dg.mdsrose.project.processor.DataFileProcessor;
-import com.dg.mdsrose.project.processor.FileProcessor;
-import com.dg.mdsrose.project.processor.FileProcessorResult;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
@@ -20,29 +17,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
-
-import static com.dg.mdsrose.enums.FileMetadata.CSV;
-import static com.dg.mdsrose.enums.FileMetadata.DATA;
+import java.util.Objects;
 
 public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     private JPanel selectShapeAndColorPanel;
     private JButton confirmButton;
     private JPanel classesPanel;
 
-
-    private final String path;
+    private final List<DatasetClass> datasetClasses;
+    private final ProjectService projectService = InMemoryProjectService.getInstance();
     private final List<JComboBox<String>> colorComponents = new ArrayList<>();
     private final List<JComboBox<String>> markerComponents = new ArrayList<>();
     private final List<JLabel> labelComponents = new ArrayList<>();
 
-    private Map<Integer, String> selectedColumns = new HashMap<>();
-    private FileProcessorResult result;
     private int numClasses;
 
-    SelectShapeAndColor(String path, Map<Integer, String> selectedColumns) {
+    SelectShapeAndColor() {
         createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -51,8 +43,8 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
         });
         this.confirmButton.addActionListener(this);
 
-        this.path = path;
-        this.selectedColumns = selectedColumns;
+        datasetClasses = projectService.findAllDatasetClasses();
+
         generateDatasetClass();
     }
 
@@ -72,41 +64,21 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     }
 
     private void generateDatasetClass() {
-        try {
-            FileProcessor fileProcessor;
-            if (path.endsWith(DATA.getExtension())) {
-                fileProcessor = new DataFileProcessor(path, selectedColumns);
-            } else if (path.endsWith(CSV.getExtension())) {
-                fileProcessor = new CSVFileProcessor(path, selectedColumns);
-            } else {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Cannot generate dataset class!",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
-            result = fileProcessor.process();
-            List<String> datasetClasses = result.classes();
-            numClasses = datasetClasses.size();
-            classesPanel.setLayout(new GridLayout(numClasses, 3, 10, 10));
-            for (String datasetClass : datasetClasses) {
-                JComboBox<String> colorClassComboBox = new JComboBox<>(ColorOption.comboBoxOptions());
-                JComboBox<String> markerClassComboBox = new JComboBox<>(MarkerOption.comboBoxOptions());
-                JLabel jLabel = new JLabel(datasetClass);
-                classesPanel.add(colorClassComboBox);
-                classesPanel.add(markerClassComboBox);
-                classesPanel.add(jLabel);
-                colorComponents.add(colorClassComboBox);
-                markerComponents.add(markerClassComboBox);
-                labelComponents.add(jLabel);
-            }
-            classesPanel.revalidate();
-            classesPanel.repaint();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        numClasses = datasetClasses.size();
+        classesPanel.setLayout(new GridLayout(numClasses, 3, 10, 10));
+        for (DatasetClass datasetClass : datasetClasses) {
+            JComboBox<String> colorClassComboBox = new JComboBox<>(ColorOption.comboBoxOptions());
+            JComboBox<String> markerClassComboBox = new JComboBox<>(MarkerOption.comboBoxOptions());
+            JLabel jLabel = new JLabel(datasetClass.getName());
+            classesPanel.add(colorClassComboBox);
+            classesPanel.add(markerClassComboBox);
+            classesPanel.add(jLabel);
+            colorComponents.add(colorClassComboBox);
+            markerComponents.add(markerClassComboBox);
+            labelComponents.add(jLabel);
         }
+        classesPanel.revalidate();
+        classesPanel.repaint();
     }
 
     @Override
@@ -140,9 +112,16 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
             .map(ConcreteShapeBuilder::getResult)
             .toList();
 
-        ProjectService projectService = new InMemoryProjectService().createProjectService();
-        Long projectId = projectService.save(result.completeDatasetRows(), shapes, selectedColumns);
-        new ShowProject(projectService, projectId, true);
+        for (int i = 0; i < datasetClasses.size(); i++) {
+            DatasetClass datasetClass = datasetClasses.get(i);
+            Shape shape = shapes.get(i);
+
+            datasetClass.setColor(shape.getColor().name());
+            datasetClass.setMarker(shape.getMarker().name());
+            projectService.updateDatasetClass(datasetClass);
+        }
+
+        new ShowProject(projectService);
         this.dispose();
     }
 

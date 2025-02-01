@@ -5,10 +5,7 @@ import com.dg.mdsrose.enums.DBTable;
 import com.dg.mdsrose.project.model.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class DBProjectDAO implements ProjectDAO {
     @Override
@@ -78,7 +75,7 @@ public class DBProjectDAO implements ProjectDAO {
     }
 
     @Override
-    public Long insertDatasetFeatures(DatasetFeature datasetFeature) {
+    public Long insertDatasetFeature(DatasetFeature datasetFeature) {
         String sql = new StringJoiner(" ")
                 .add("INSERT INTO")
                 .add(DBTable.DATASET_FEATURE.getValue())
@@ -528,5 +525,58 @@ public class DBProjectDAO implements ProjectDAO {
         }
 
         return false;
+    }
+
+    @Override
+    public List<DatasetClass> findAllDatasetClasses() {
+        return List.of();
+    }
+
+    @Override
+    public void updateDatasetClass(DatasetClass datasetClass) {}
+
+    @Override
+    public List<DatasetRow> findAllDatasetRows() {
+        return List.of();
+    }
+
+    @Override
+    public List<DatasetFeature> findAllDatasetFeatures() {
+        return List.of();
+    }
+
+    @Override
+    public void bulkInsertDatasetFeatureRows(List<DatasetFeatureRow> datasetFeatureRows) {
+        StringJoiner sqlJoiner = new StringJoiner(" ")
+            .add("INSERT INTO")
+            .add(DBTable.DATASET_FEATURE_ROW.getValue())
+            .add("(dataset_row_id, dataset_feature_id, value) VALUES");
+
+        for(int i=0;i<datasetFeatureRows.size();i++) {
+            String row = " (?, ?, ?)";
+            if(i < datasetFeatureRows.size() - 1) row += ",";
+            sqlJoiner.add(row);
+        }
+        String sql = sqlJoiner.toString();
+
+        try(
+            Connection connection = DB.createConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)
+        ){
+            int currIdx = 0;
+            for(DatasetFeatureRow datasetFeatureRow : datasetFeatureRows) {
+                preparedStatement.setLong(++currIdx, datasetFeatureRow.getRowId());
+                preparedStatement.setLong(++currIdx, datasetFeatureRow.getFeatureId());
+                preparedStatement.setDouble(++currIdx, datasetFeatureRow.getValue());
+            }
+            preparedStatement.execute();
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void clearTables() {
+
     }
 }

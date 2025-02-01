@@ -20,6 +20,10 @@ public class DatasetFeature {
         this.projectId = projectId;
     }
 
+    public DatasetFeature(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }

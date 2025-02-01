@@ -1,5 +1,6 @@
 package com.dg.mdsrose.view;
 
+import com.dg.mdsrose.project.processor.DataFileProcessor;
 import com.dg.mdsrose.util.DataDataset;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class DataSelectColumn extends BaseJFrame implements ActionListener {
+public class DataSelectColumn extends SelectColumnBaseFrame implements ActionListener {
 
     private JButton confirmButton;
     private JPanel dataSelectColumnPanel;
@@ -97,7 +98,8 @@ public class DataSelectColumn extends BaseJFrame implements ActionListener {
             }
         }
 
-        new SelectShapeAndColor(this.path, selectedColumns);
+        partialSave(new DataFileProcessor(path, selectedColumns), selectedColumns);
+        new SelectShapeAndColor();
         this.dispose();
     }
 

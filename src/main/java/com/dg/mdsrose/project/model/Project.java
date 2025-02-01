@@ -13,6 +13,11 @@ public class Project {
         this.userId = userId;
     }
 
+    public Project(String name, Long userId) {
+        this.name = name;
+        this.userId = userId;
+    }
+
     public Project(Long userId) {
         this.userId = userId;
     }

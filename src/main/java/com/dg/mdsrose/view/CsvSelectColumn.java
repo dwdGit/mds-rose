@@ -1,5 +1,6 @@
 package com.dg.mdsrose.view;
 
+import com.dg.mdsrose.project.processor.CSVFileProcessor;
 import com.dg.mdsrose.util.CsvDataset;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CsvSelectColumn extends BaseJFrame implements ActionListener {
+public class CsvSelectColumn extends SelectColumnBaseFrame implements ActionListener {
     private JPanel selectColumnPanel;
     private JList<String> columnList;
     private JButton confirmButton;
@@ -90,7 +91,8 @@ public class CsvSelectColumn extends BaseJFrame implements ActionListener {
                 selectedColumns.put(pair.getLeft() + 1, pair.getRight());
             }
         });
-        new SelectShapeAndColor(this.path, selectedColumns);
+        partialSave(new CSVFileProcessor(path, selectedColumns), selectedColumns);
+        new SelectShapeAndColor();
         this.dispose();
     }
 
