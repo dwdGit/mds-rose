@@ -1,7 +1,7 @@
 package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.project.processor.DataFileProcessor;
-import com.dg.mdsrose.util.DataDataset;
+import com.dg.mdsrose.project.extractor.DataDatasetColumnExtractor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.StringUtils;
@@ -43,8 +43,8 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         confirmButton.addActionListener(this);
 
         this.path = path;
-        DataDataset dataDataset = new DataDataset(path);
-        numColumnsDataset = dataDataset.getNumberOfColumns();
+        DataDatasetColumnExtractor dataDatasetColumnExtractor = new DataDatasetColumnExtractor(path);
+        numColumnsDataset = dataDatasetColumnExtractor.extractColumnsMetadata();
     }
 
     @Override

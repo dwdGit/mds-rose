@@ -1,4 +1,4 @@
-package com.dg.mdsrose.util;
+package com.dg.mdsrose.project.extractor;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -6,14 +6,13 @@ import java.io.IOException;
 
 import static com.dg.mdsrose.enums.FileMetadata.DATA;
 
-public class DataDataset {
-    private final String path;
-
-    public DataDataset(String path) {
-        this.path = path;
+public class DataDatasetColumnExtractor extends DatasetColumnExtractor<Integer> {
+    public DataDatasetColumnExtractor(String path) {
+        super(path);
     }
 
-    public Integer getNumberOfColumns() {
+    @Override
+    public Integer extractColumnsMetadata() {
         int numberOfColumns = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -24,5 +23,4 @@ public class DataDataset {
         }
         return numberOfColumns;
     }
-
 }

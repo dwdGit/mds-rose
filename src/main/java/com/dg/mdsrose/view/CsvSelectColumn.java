@@ -1,7 +1,7 @@
 package com.dg.mdsrose.view;
 
 import com.dg.mdsrose.project.processor.CSVFileProcessor;
-import com.dg.mdsrose.util.CsvDataset;
+import com.dg.mdsrose.project.extractor.CSVDatasetColumnExtractor;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,7 +15,6 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class CsvSelectColumn extends SelectColumnBaseFrame implements ActionListener {
     private JPanel selectColumnPanel;
@@ -51,8 +50,8 @@ public class CsvSelectColumn extends SelectColumnBaseFrame implements ActionList
     }
 
     private void populateList() {
-        CsvDataset csvDataset = new CsvDataset(path);
-        Optional<List<Pair<Integer, String>>> optionalCsvColumns = csvDataset.getColumns();
+        CSVDatasetColumnExtractor csvDatasetColumnExtractor = new CSVDatasetColumnExtractor(path);
+        List<Pair<Integer, String>> optionalCsvColumns = csvDatasetColumnExtractor.extractColumnsMetadata();
         if (optionalCsvColumns.isEmpty()) {
             JOptionPane.showMessageDialog(
                 this,
@@ -63,7 +62,7 @@ public class CsvSelectColumn extends SelectColumnBaseFrame implements ActionList
             return;
         }
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        csvColumns = optionalCsvColumns.get();
+        csvColumns = optionalCsvColumns;
         csvColumns.forEach(pair -> listModel.addElement(pair.getRight()));
         columnList.setModel(listModel);
     }

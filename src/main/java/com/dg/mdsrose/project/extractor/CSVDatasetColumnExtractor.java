@@ -1,4 +1,4 @@
-package com.dg.mdsrose.util;
+package com.dg.mdsrose.project.extractor;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -7,18 +7,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.dg.mdsrose.enums.FileMetadata.CSV;
 
-public class CsvDataset {
-    private final String path;
-
-    public CsvDataset(String path) {
-        this.path = path;
+public class CSVDatasetColumnExtractor extends DatasetColumnExtractor<List<Pair<Integer, String>>> {
+    public CSVDatasetColumnExtractor(String path) {
+        super(path);
     }
 
-    public Optional<List<Pair<Integer,String>>> getColumns(){
+    @Override
+    public List<Pair<Integer, String>> extractColumnsMetadata() {
         List<Pair<Integer,String>> columnNames = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String headerLine = br.readLine();
@@ -29,6 +27,6 @@ public class CsvDataset {
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        return Optional.of(columnNames);
+        return columnNames;
     }
 }
