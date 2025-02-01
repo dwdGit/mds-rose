@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class DataSelectColumn extends JFrame implements ActionListener {
+public class DataSelectColumn extends BaseJFrame implements ActionListener {
 
     private JButton confirmButton;
     private JPanel dataSelectColumnPanel;
@@ -22,21 +22,15 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JButton generateRowButton;
     private JPanel rowPanel;
 
+    private static final String PREFIX_INDEX_COLUMN_INPUT_FIELD = "numberColumn";
+    private static final String PREFIX_NAME_COLUMN_INPUT_FIELD = "nameColumn";
     private final Map<Integer, String> selectedColumns = new HashMap<>();
     private final String path;
-    private final String prefixIndexColumnInputField = "numberColumn";
-    private final String prefixNameColumnInputField = "nameColumn";
     private final Integer numColumnsDataset;
     private boolean rowGenerated;
 
     public DataSelectColumn(String path) {
-        this.setTitle("Select Column");
-        this.setContentPane(dataSelectColumnPanel);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -48,6 +42,16 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         this.path = path;
         DataDataset dataDataset = new DataDataset(path);
         numColumnsDataset = dataDataset.getNumberOfColumns();
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Select Column";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return dataSelectColumnPanel;
     }
 
     @Override
@@ -77,10 +81,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         String nameColumn = null;
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if (textField.getName().startsWith(prefixIndexColumnInputField)) {
+                if (textField.getName().startsWith(PREFIX_INDEX_COLUMN_INPUT_FIELD)) {
                     numColumn = Integer.parseInt(textField.getText());
                 }
-                if (textField.getName().startsWith(prefixNameColumnInputField)) {
+                if (textField.getName().startsWith(PREFIX_NAME_COLUMN_INPUT_FIELD)) {
                     nameColumn = textField.getText();
                 }
                 if (Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
@@ -137,7 +141,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     }
 
     private boolean checkNumericField(JTextField textField) {
-        return textField.getName().startsWith(prefixIndexColumnInputField);
+        return textField.getName().startsWith(PREFIX_INDEX_COLUMN_INPUT_FIELD);
     }
 
     private boolean checkInputAreEmpty(JTextField textField) {
@@ -172,10 +176,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
-            numColField.setName(prefixIndexColumnInputField + i);
+            numColField.setName(PREFIX_INDEX_COLUMN_INPUT_FIELD + i);
             JLabel numColLabel = new JLabel(".");
             JTextField nameColField = new JTextField(0);
-            nameColField.setName(prefixNameColumnInputField + i);
+            nameColField.setName(PREFIX_NAME_COLUMN_INPUT_FIELD + i);
             rowPanel.add(numColField);
             rowPanel.add(numColLabel);
             rowPanel.add(nameColField);
@@ -239,5 +243,4 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return dataSelectColumnPanel;
     }
-
 }

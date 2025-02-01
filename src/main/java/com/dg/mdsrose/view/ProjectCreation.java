@@ -14,7 +14,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.Objects;
 
-public class ProjectCreation extends JFrame implements ActionListener {
+import static com.dg.mdsrose.enums.FileMetadata.CSV;
+import static com.dg.mdsrose.enums.FileMetadata.DATA;
+
+public class ProjectCreation extends BaseJFrame implements ActionListener {
 
     private JTextField pathDatasetField;
     private JButton selectDatasetButton;
@@ -24,12 +27,7 @@ public class ProjectCreation extends JFrame implements ActionListener {
 
 
     public ProjectCreation() {
-        this.setTitle("New Project");
-        this.setContentPane(newProjectPanel);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -37,6 +35,21 @@ public class ProjectCreation extends JFrame implements ActionListener {
         });
         selectDatasetButton.addActionListener(this);
         confirmButton.addActionListener(this);
+    }
+
+    @Override
+    protected String setTitle() {
+        return "New Project";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return newProjectPanel;
+    }
+
+    @Override
+    protected Dimension setPreferredSize() {
+        return null;
     }
 
     @Override
@@ -50,9 +63,9 @@ public class ProjectCreation extends JFrame implements ActionListener {
 
     private void confirmFile() {
         DatasetStrategy datasetStrategy;
-        if (pathDatasetField.getText().endsWith(".data")) {
+        if (pathDatasetField.getText().endsWith(DATA.getExtension())) {
             datasetStrategy = new DataStrategy();
-        } else if (pathDatasetField.getText().endsWith(".csv")) {
+        } else if (pathDatasetField.getText().endsWith(CSV.getExtension())) {
             datasetStrategy = new CsvStrategy();
         } else {
             JOptionPane.showMessageDialog(
@@ -78,11 +91,11 @@ public class ProjectCreation extends JFrame implements ActionListener {
         if (returnDialog == JFileChooser.APPROVE_OPTION) {
             file = jFileChooser.getSelectedFile();
         } else {
-            System.out.println("No Selection File Selected");
+            System.out.println("No File Selected");
             return;
         }
         if (Objects.isNull(file)) {
-            System.out.println("No File Selected");
+            System.out.println("No Valid File Selected");
         }
         this.pathDatasetField.setText(file.getAbsolutePath());
     }
@@ -128,5 +141,4 @@ public class ProjectCreation extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return newProjectPanel;
     }
-
 }

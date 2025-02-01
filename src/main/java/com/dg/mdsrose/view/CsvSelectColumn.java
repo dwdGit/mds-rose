@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class CsvSelectColumn extends JFrame implements ActionListener {
+public class CsvSelectColumn extends BaseJFrame implements ActionListener {
     private JPanel selectColumnPanel;
     private JList<String> columnList;
     private JButton confirmButton;
@@ -24,13 +24,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
     private List<Pair<Integer, String>> csvColumns;
 
     public CsvSelectColumn(String path) {
-        this.setTitle("Select Column");
-        this.setContentPane(selectColumnPanel);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -41,6 +35,16 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
         this.path = path;
         populateList();
         confirmButton.addActionListener(this);
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Select Column";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return selectColumnPanel;
     }
 
     private void populateList() {
@@ -63,7 +67,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == confirmButton) {
+        if (e.getSource().equals(confirmButton)) {
             confirmColumns();
         }
     }
@@ -122,10 +126,4 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return selectColumnPanel;
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
-
 }

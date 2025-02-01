@@ -14,32 +14,40 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Objects;
 
-public class Homepage extends JFrame implements ActionListener {
+public class Homepage extends BaseJFrame implements ActionListener {
     private JLabel yourProjectsLabel;
     private JPanel homepagePanel;
     private JButton newProjectButton;
     private JList<Project> projectList;
     private JButton openProjectButton;
 
-    public Homepage() {
-        this.setTitle("Homepage");
-        this.setContentPane(homepagePanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+    private final UserSession userSession = UserSession.getInstance();
 
+    public Homepage() {
+        createAndShowGUI();
         getProjects();
         newProjectButton.addActionListener(this);
         openProjectButton.addActionListener(this);
     }
 
+    @Override
+    protected String setTitle() {
+        return "Homepage";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return homepagePanel;
+    }
+
+    @Override
+    protected int setDefaultCloseOperation() {
+        return WindowConstants.EXIT_ON_CLOSE;
+    }
+
     private void getProjects() {
-        UserSession instance = UserSession.getInstance();
-        DBProjectDAO dao = new DBProjectDAO();
-        ProjectService projectService = new ProjectService(dao);
-        List<Project> projects = projectService.findProjectByUserId(instance.getUserId());
+        ProjectService projectService = new ProjectService(new DBProjectDAO());
+        List<Project> projects = projectService.findProjectByUserId(userSession.getUserId());
         projectList.setListData(projects.toArray(new Project[0]));
         projectList.setCellRenderer(new ProjectRenderer());
     }
@@ -54,9 +62,10 @@ public class Homepage extends JFrame implements ActionListener {
     }
 
     private void openProject() {
-        Project selectedProject = (Project) projectList.getSelectedValue();
+        Project selectedProject = projectList.getSelectedValue();
         if (Objects.isNull(selectedProject)) {
-            //todo error select project
+            JOptionPane.showMessageDialog(null, "No project selected!", "Project Selection", JOptionPane.ERROR_MESSAGE);
+            return;
         }
         ProjectService projectService = new DBProjectService().createProjectService();
         new ShowProject(projectService, selectedProject.getId(), false);
@@ -108,5 +117,4 @@ public class Homepage extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return homepagePanel;
     }
-
 }

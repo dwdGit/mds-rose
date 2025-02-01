@@ -13,7 +13,7 @@ import java.util.Map;
  * Template pattern implementation to process dataset files
  * */
 public abstract class FileProcessor {
-    private static final String DELIMETER = ",";
+    private static final String DEFAULT_DELIMITER = ",";
     String fileName;
     Map<Integer, String> columnsToPick;
 
@@ -36,7 +36,7 @@ public abstract class FileProcessor {
 
         for(String line : lines) {
             // split the row by comma to get all values
-            String[] columns = line.split(DELIMETER);
+            String[] columns = line.split(getDelimiter());
 
             // declare a data array with the same size of columns to pick
             double[] data = new double[columnsToPick.size()];
@@ -63,6 +63,10 @@ public abstract class FileProcessor {
         }
 
         return new ExtractedDatasetData(pDataRows, classes);
+    }
+
+    private String getDelimiter() {
+        return DEFAULT_DELIMITER;
     }
 
     public double[][] calculateDissimilarityMatrix(List<PartialDatasetRow> partialDatasetRows) {

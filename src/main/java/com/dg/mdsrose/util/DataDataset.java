@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class DataDataset {
-    private static final String DELIMETER = ",";
+import static com.dg.mdsrose.enums.FileMetadata.DATA;
 
+public class DataDataset {
     private final String path;
 
     public DataDataset(String path) {
@@ -18,7 +18,7 @@ public class DataDataset {
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String headerLine = br.readLine();
-            numberOfColumns = headerLine.split(DELIMETER).length;
+            numberOfColumns = headerLine.split(DATA.getDelimiter()).length;
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }

@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Optional;
 
-public class Login extends JFrame implements ActionListener {
+public class Login extends BaseJFrame implements ActionListener {
     private JButton loginButton;
     private JPanel loginPanel;
     private JTextField usernameField;
@@ -23,14 +23,29 @@ public class Login extends JFrame implements ActionListener {
     private final UserSession userSession = UserSession.getInstance();
 
     public Login() {
-        this.setTitle("Login");
-        this.setContentPane(loginPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         loginButton.addActionListener(this);
         goToSignupButton.addActionListener(this);
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return loginPanel;
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Login";
+    }
+
+    @Override
+    protected int setDefaultCloseOperation() {
+        return WindowConstants.EXIT_ON_CLOSE;
+    }
+
+    @Override
+    protected Dimension setPreferredSize() {
+        return null;
     }
 
     @Override

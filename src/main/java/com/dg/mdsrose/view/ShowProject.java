@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ShowProject extends JFrame implements ActionListener {
+public class ShowProject extends BaseJFrame implements ActionListener {
     private JPanel showProjectPanel;
     private JButton showPointsButton;
     private JPanel chartContainerPanel;
@@ -35,8 +35,8 @@ public class ShowProject extends JFrame implements ActionListener {
     private final List<DatasetClass> datasetClasses;
     private final List<DatasetRow> datasetRows;
     private final List<DatasetFeature> datasetFeatures;
+    private final Long projectId;
     private DefaultTableModel selectedPoints;
-    private Long projectId;
 
 
     public ShowProject(ProjectService projectService, Long projectId, boolean canSave) {
@@ -46,12 +46,7 @@ public class ShowProject extends JFrame implements ActionListener {
         this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
         this.projectId = projectId;
 
-        this.setTitle("Show project");
-        this.setContentPane(showProjectPanel);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -69,6 +64,16 @@ public class ShowProject extends JFrame implements ActionListener {
         saveButton.setEnabled(canSave);
         showPointsButton.addActionListener(this);
         saveButton.addActionListener(this);
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Show project";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return showProjectPanel;
     }
 
     private void generateChart() {
@@ -254,5 +259,4 @@ public class ShowProject extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return showProjectPanel;
     }
-
 }

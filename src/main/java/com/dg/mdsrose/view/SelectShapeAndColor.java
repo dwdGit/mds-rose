@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
-public class SelectShapeAndColor extends JFrame implements ActionListener {
+import static com.dg.mdsrose.enums.FileMetadata.CSV;
+import static com.dg.mdsrose.enums.FileMetadata.DATA;
+
+public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
     private JPanel selectShapeAndColorPanel;
     private JButton confirmButton;
     private JPanel classesPanel;
@@ -40,13 +43,7 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
     private int numClasses;
 
     SelectShapeAndColor(String path, Map<Integer, String> selectedColumns) {
-        this.setTitle("Select shape and color");
-        this.setContentPane(selectShapeAndColorPanel);
-        this.setPreferredSize(new Dimension(500, 300));
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -59,13 +56,36 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
         generateDatasetClass();
     }
 
+    @Override
+    protected String setTitle() {
+        return "Select shape and color";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return selectShapeAndColorPanel;
+    }
+
+    @Override
+    protected Dimension setPreferredSize() {
+        return new Dimension(500, 300);
+    }
+
     private void generateDatasetClass() {
         try {
             FileProcessor fileProcessor;
-            if (path.endsWith(".data")) {
+            if (path.endsWith(DATA.getExtension())) {
                 fileProcessor = new DataFileProcessor(path, selectedColumns);
-            } else {
+            } else if (path.endsWith(CSV.getExtension())) {
                 fileProcessor = new CSVFileProcessor(path, selectedColumns);
+            } else {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Cannot generate dataset class!",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+                return;
             }
             result = fileProcessor.process();
             List<String> datasetClasses = result.classes();
@@ -185,5 +205,4 @@ public class SelectShapeAndColor extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return selectShapeAndColorPanel;
     }
-
 }
