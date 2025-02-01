@@ -5,7 +5,6 @@ import com.dg.mdsrose.enums.MarkerOption;
 import com.dg.mdsrose.project.InMemoryProjectService;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.builder.ConcreteShapeBuilder;
-import com.dg.mdsrose.project.builder.SelectedShape;
 import com.dg.mdsrose.project.model.DatasetClass;
 import com.dg.mdsrose.project.model.Shape;
 import com.intellij.uiDesigner.core.GridConstraints;
@@ -150,6 +149,37 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
             selectedShapes.add(selectedShape);
         }
         return selectedShapes;
+    }
+
+    public static class SelectedShape {
+
+        private String color;
+        private String marker;
+        private String label;
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public String getMarker() {
+            return marker;
+        }
+
+        public void setMarker(String marker) {
+            this.marker = marker;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
     }
 
     {
