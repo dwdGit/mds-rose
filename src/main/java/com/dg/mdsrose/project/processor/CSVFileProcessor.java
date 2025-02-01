@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 public class CSVFileProcessor extends FileProcessor {
-    public CSVFileProcessor(String fileName, Map<Integer, String> columnsToPick) {
-        this.fileName = fileName;
+    public CSVFileProcessor(String filePath, Map<Integer, String> columnsToPick) {
+        this.filePath = filePath;
         this.columnsToPick = columnsToPick;
     }
 
-    public List<String> parseFile(String fileName) throws IOException {
-        List<String> lines = Files.readAllLines(Paths.get(fileName));
+    public List<String> parseFile() throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(filePath));
         lines.removeFirst();
         return lines;
     }

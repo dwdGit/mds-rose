@@ -4,7 +4,10 @@ import com.dg.mdsrose.enums.ColorOption;
 import com.dg.mdsrose.enums.MarkerOption;
 import com.dg.mdsrose.project.DBProjectService;
 import com.dg.mdsrose.project.ProjectService;
-import com.dg.mdsrose.project.model.*;
+import com.dg.mdsrose.project.model.DatasetClass;
+import com.dg.mdsrose.project.model.DatasetFeature;
+import com.dg.mdsrose.project.model.DatasetFeatureRow;
+import com.dg.mdsrose.project.model.DatasetRow;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ShowProject extends BaseJFrame implements ActionListener {
     private JPanel showProjectPanel;
@@ -42,30 +44,29 @@ public class ShowProject extends BaseJFrame implements ActionListener {
 
 
     public ShowProject(ProjectService projectService, Long projectId, boolean canSave) {
-        this.projectService = projectService;
-        this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
-        this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
-        this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
-        this.projectId = projectId;
-
         createAndShowGUI();
+
+        showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
+        chartContainerPanel.setLayout(new GridLayout(1, 1));
+        showProjectPanel.add(chartContainerPanel);
+
+        saveButton.setVisible(canSave);
+        saveButton.setEnabled(canSave);
+        showPointsButton.addActionListener(this);
+        saveButton.addActionListener(this);
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
             }
         });
 
-        showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
-        chartContainerPanel.setLayout(new GridLayout(1, 1));
-        showProjectPanel.add(chartContainerPanel);
-
+        this.projectService = projectService;
+        this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
+        this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
+        this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
+        this.projectId = projectId;
         generateChart();
         this.setVisible(true);
-
-        saveButton.setVisible(canSave);
-        saveButton.setEnabled(canSave);
-        showPointsButton.addActionListener(this);
-        saveButton.addActionListener(this);
     }
 
     @Override
@@ -141,7 +142,6 @@ public class ShowProject extends BaseJFrame implements ActionListener {
                 datasetRow.getY() >= yLowerBound && datasetRow.getY() <= yUpperBound)
             .toList();
         if (ObjectUtils.isNotEmpty(listSelectedPoints)) {
-
             DefaultTableModel model = new DefaultTableModel();
             model.addColumn("class");
             model.addColumn("mds-x");
@@ -200,23 +200,29 @@ public class ShowProject extends BaseJFrame implements ActionListener {
             return;
         }
 
-        List<DatasetClass> datasetClassesByProjectId = projectService.findDatasetClassesByProjectId(projectId);
-        List<DatasetFeature> datasetFeaturesByProjectId = projectService.findDatasetFeaturesByProjectId(projectId);
-        List<DatasetRow> datasetRowsByProjectId = projectService.findDatasetRowsByProjectId(projectId);
-        List<Long> listDatasetRowIds = datasetRowsByProjectId.stream().map(DatasetRow::getId).collect(Collectors.toList());
-        List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowIds(listDatasetRowIds);
+        projectService.findProject(projectId)
+            .ifPresentOrElse(
+                project -> {
+                    List<DatasetClass> datasetClassesByProjectId = projectService.findDatasetClassesByProjectId(projectId);
+                    List<DatasetFeature> datasetFeaturesByProjectId = projectService.findDatasetFeaturesByProjectId(projectId);
+                    List<DatasetRow> datasetRowsByProjectId = projectService.findDatasetRowsByProjectId(projectId);
+                    List<Long> listDatasetRowIds = datasetRowsByProjectId.stream()
+                        .map(DatasetRow::getId)
+                        .toList();
+                    List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowIds(listDatasetRowIds);
 
-        Optional<Project> optionalProject = projectService.findProject(projectId);
-        if (optionalProject.isPresent()) {
-            Project project = optionalProject.get();
-            project.setName(projectName);
-            dbProjectService.save(
-                datasetClassesByProjectId,
-                datasetFeaturesByProjectId,
-                datasetRowsByProjectId,
-                datasetFeatureRows,
-                project);
-        }
+                    project.setName(projectName);
+
+                    dbProjectService.save(
+                        datasetClassesByProjectId,
+                        datasetFeaturesByProjectId,
+                        datasetRowsByProjectId,
+                        datasetFeatureRows,
+                        project
+                    );
+                },
+                () -> System.err.printf("No project found with id `%d`%n", projectId)
+            );
 
         new Homepage();
         this.dispose();

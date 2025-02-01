@@ -14,11 +14,11 @@ import java.util.Map;
  * */
 public abstract class FileProcessor {
     private static final String DEFAULT_DELIMITER = ",";
-    String fileName;
-    Map<Integer, String> columnsToPick;
+    protected String filePath;
+    protected Map<Integer, String> columnsToPick;
 
     public FileProcessorResult process() throws IOException {
-        List<String> lines = parseFile(fileName);
+        List<String> lines = parseFile();
         ExtractedDatasetData extractedDatasetData = extractDatasetContent(lines);
         double[][] dissimilarityMatrix = calculateDissimilarityMatrix(extractedDatasetData.partialDatasetRows());
         double[][] mds = calculateMDS(dissimilarityMatrix);
@@ -26,8 +26,8 @@ public abstract class FileProcessor {
         return parseResult(extractedDatasetData, mds);
     }
 
-    public List<String> parseFile(String fileName) throws IOException {
-        return Files.readAllLines(Paths.get(fileName));
+    public List<String> parseFile() throws IOException {
+        return Files.readAllLines(Paths.get(filePath));
     }
 
     public ExtractedDatasetData extractDatasetContent(List<String> lines) {

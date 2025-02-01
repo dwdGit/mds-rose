@@ -29,7 +29,12 @@ public class ProjectService {
         Long projectId = projectDAO.insertProject(project);
 
         shapes.forEach(shape -> {
-            DatasetClass datasetClass = new DatasetClass(shape.getLabel(), shape.getMarker().name(), shape.getColor().name(), projectId);
+            DatasetClass datasetClass = new DatasetClass(
+                shape.getLabel(),
+                shape.getMarker().name(),
+                shape.getColor().name(),
+                projectId
+            );
             classIds.put(shape.getLabel(), projectDAO.insertDatasetClass(datasetClass));
         });
 
@@ -40,11 +45,20 @@ public class ProjectService {
         }
 
         listCompleteDatasetRows.forEach(completeDatasetRow -> {
-            DatasetRow datasetRow = new DatasetRow(classIds.get(completeDatasetRow.label()), completeDatasetRow.x(), completeDatasetRow.y(), projectId);
+            DatasetRow datasetRow = new DatasetRow(
+                classIds.get(completeDatasetRow.label()),
+                completeDatasetRow.x(),
+                completeDatasetRow.y(),
+                projectId
+            );
             Long rowId = projectDAO.insertDatasetRow(datasetRow);
 
             for(int i = 0; i < completeDatasetRow.features().length; i++) {
-                DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow(featureIds.get(i), rowId, completeDatasetRow.features()[i]);
+                DatasetFeatureRow datasetFeatureRow = new DatasetFeatureRow(
+                    featureIds.get(i),
+                    rowId,
+                    completeDatasetRow.features()[i]
+                );
                 projectDAO.insertDatasetFeatureRow(datasetFeatureRow);
             }
         });
