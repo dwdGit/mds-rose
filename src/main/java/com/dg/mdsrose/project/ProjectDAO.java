@@ -10,11 +10,11 @@ public interface ProjectDAO {
 
     Long insertDatasetClass(DatasetClass datasetClass);
 
-    Long insertDatasetFeatures(DatasetFeature datasetFeature);
+    Long insertDatasetFeature(DatasetFeature datasetFeature);
 
     Long insertDatasetRow(DatasetRow datasetRow);
 
-    Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow);
+    void insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow);
 
     Optional<DatasetClass> findDatasetClassById(Long id);
 
@@ -33,4 +33,18 @@ public interface ProjectDAO {
     List<DatasetFeatureRow> findDatasetFeatureRowsByRowIds(List<Long> rowIds);
 
     List<Project> findProjectByUserId(Long id);
+
+    boolean projectExistsByName(String name);
+
+    List<DatasetClass> findAllDatasetClasses();
+
+    void updateDatasetClass(DatasetClass datasetClass);
+
+    List<DatasetRow> findAllDatasetRows();
+
+    List<DatasetFeature> findAllDatasetFeatures();
+
+    void bulkInsertDatasetFeatureRows(List<DatasetFeatureRow> datasetFeatureRows);
+
+    void clearTables();
 }

@@ -25,12 +25,21 @@ public enum MarkerOption {
         return shape;
     }
 
-    public static MarkerOption from(String marker) {
+    public static MarkerOption from(String value) {
         for (MarkerOption shape : MarkerOption.values()) {
-            if (shape.getValue().equals(marker)) {
+            if (shape.getValue().equals(value)) {
                 return shape;
             }
         }
         return null;
+    }
+
+    public static String[] comboBoxOptions() {
+        String[] options = new String[MarkerOption.values().length];
+        MarkerOption[] values = MarkerOption.values();
+        for(int i=0; i<values.length; i++) {
+            options[i] = values[i].getValue();
+        }
+        return options;
     }
 }

@@ -5,6 +5,9 @@ import com.dg.mdsrose.enums.MarkerOption;
 import com.dg.mdsrose.project.DBProjectService;
 import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.model.*;
+import com.dg.mdsrose.user.UserSession;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -23,52 +26,77 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class ShowProject extends JFrame implements ActionListener {
+public class ShowProject extends BaseJFrame implements ActionListener {
     private JPanel showProjectPanel;
     private JButton showPointsButton;
     private JPanel chartContainerPanel;
     private JButton saveButton;
 
+    private final UserSession userSession = UserSession.getInstance();
     private final ProjectService projectService;
     private final List<DatasetClass> datasetClasses;
     private final List<DatasetRow> datasetRows;
     private final List<DatasetFeature> datasetFeatures;
     private DefaultTableModel selectedPoints;
-    private Long projectId;
 
 
-    public ShowProject(ProjectService projectService, Long projectId, boolean canSave) {
-        this.projectService = projectService;
-        this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
-        this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
-        this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
-        this.projectId = projectId;
+    public ShowProject(ProjectService projectService) {
+        createAndShowGUI();
 
-        this.setTitle("Show project");
-        this.setContentPane(showProjectPanel);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
+        showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
+        chartContainerPanel.setLayout(new GridLayout(1, 1));
+        showProjectPanel.add(chartContainerPanel);
+
+        showPointsButton.addActionListener(this);
+        saveButton.addActionListener(this);
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
             }
         });
 
+        this.projectService = projectService;
+        this.datasetClasses = projectService.findAllDatasetClasses();
+        this.datasetRows = projectService.findAllDatasetRows();
+        this.datasetFeatures = projectService.findAllDatasetFeatures();
+        generateChart();
+        this.setVisible(true);
+    }
+
+    public ShowProject(ProjectService projectService, Long projectId) {
+        createAndShowGUI();
+
         showProjectPanel.setLayout(new BoxLayout(showProjectPanel, BoxLayout.Y_AXIS));
         chartContainerPanel.setLayout(new GridLayout(1, 1));
         showProjectPanel.add(chartContainerPanel);
 
-        generateChart();
-        this.setVisible(true);
-
-        saveButton.setVisible(canSave);
-        saveButton.setEnabled(canSave);
+        saveButton.setVisible(false);
+        saveButton.setEnabled(false);
         showPointsButton.addActionListener(this);
         saveButton.addActionListener(this);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                new Homepage();
+            }
+        });
+
+        this.projectService = projectService;
+        this.datasetClasses = projectService.findDatasetClassesByProjectId(projectId);
+        this.datasetRows = projectService.findDatasetRowsByProjectId(projectId);
+        this.datasetFeatures = projectService.findDatasetFeaturesByProjectId(projectId);
+        generateChart();
+        this.setVisible(true);
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Show project";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return showProjectPanel;
     }
 
     private void generateChart() {
@@ -79,7 +107,7 @@ public class ShowProject extends JFrame implements ActionListener {
 
         // Create chart
         JFreeChart chart = ChartFactory.createXYLineChart(
-            "MDS Graph",
+            "MDS Chart",
             "X",
             "Y",
             dataset,
@@ -103,6 +131,10 @@ public class ShowProject extends JFrame implements ActionListener {
         }
         chart.getXYPlot().setRenderer(renderer);
 
+        chartContainerPanel.add(buildChartPanel(chart));
+    }
+
+    private ChartPanel buildChartPanel(JFreeChart chart) {
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setFillZoomRectangle(true);
 
@@ -116,8 +148,7 @@ public class ShowProject extends JFrame implements ActionListener {
                 showPointsButton.setEnabled(true);
             }
         });
-
-        chartContainerPanel.add(chartPanel);
+        return chartPanel;
     }
 
     private void getPointSpotlight(ValueAxis domainAxis, ValueAxis rangeAxis) {
@@ -131,7 +162,6 @@ public class ShowProject extends JFrame implements ActionListener {
                 datasetRow.getY() >= yLowerBound && datasetRow.getY() <= yUpperBound)
             .toList();
         if (ObjectUtils.isNotEmpty(listSelectedPoints)) {
-
             DefaultTableModel model = new DefaultTableModel();
             model.addColumn("class");
             model.addColumn("mds-x");
@@ -178,26 +208,34 @@ public class ShowProject extends JFrame implements ActionListener {
     }
 
     private void saveProject() {
-        String projectName = JOptionPane.showInputDialog(this, "Insert a project's name");
-
-        List<DatasetClass> datasetClassesByProjectId = projectService.findDatasetClassesByProjectId(projectId);
-        List<DatasetFeature> datasetFeaturesByProjectId = projectService.findDatasetFeaturesByProjectId(projectId);
-        List<DatasetRow> datasetRowsByProjectId = projectService.findDatasetRowsByProjectId(projectId);
-        List<Long> listDatasetRowIds = datasetRowsByProjectId.stream().map(DatasetRow::getId).collect(Collectors.toList());
-        List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowIds(listDatasetRowIds);
-
-        Optional<Project> optionalProject = projectService.findProject(projectId);
-        if (optionalProject.isPresent()) {
-            Project project = optionalProject.get();
-            project.setName(projectName);
-            ProjectService dbProjectService = new DBProjectService().createProjectService();
-            dbProjectService.save(
-                datasetClassesByProjectId,
-                datasetFeaturesByProjectId,
-                datasetRowsByProjectId,
-                datasetFeatureRows,
-                project);
+        ProjectService dbProjectService = DBProjectService.getInstance();
+        String projectName = JOptionPane.showInputDialog(this, "Insert project name");
+        if (dbProjectService.projectExistsByName(projectName)) {
+            JOptionPane.showMessageDialog(
+                this,
+                String.format("Project with name `%s` already exists!", projectName),
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
         }
+
+        List<DatasetClass> datasetClassesByProjectId = projectService.findAllDatasetClasses();
+        List<DatasetFeature> datasetFeaturesByProjectId = projectService.findAllDatasetFeatures();
+        List<DatasetRow> datasetRowsByProjectId = projectService.findAllDatasetRows();
+        List<Long> listDatasetRowIds = datasetRowsByProjectId.stream()
+            .map(DatasetRow::getId)
+            .toList();
+        List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowIds(listDatasetRowIds);
+        dbProjectService.save(
+            datasetClassesByProjectId,
+            datasetFeaturesByProjectId,
+            datasetRowsByProjectId,
+            datasetFeatureRows,
+            new Project(projectName, userSession.getUserId())
+        );
+
+        projectService.clearTables();
 
         new Homepage();
         this.dispose();
@@ -234,18 +272,18 @@ public class ShowProject extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         showProjectPanel = new JPanel();
-        showProjectPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 2, new Insets(10, 10, 10, 10), -1, -1));
+        showProjectPanel.setLayout(new GridLayoutManager(2, 2, new Insets(10, 10, 10, 10), -1, -1));
         chartContainerPanel = new JPanel();
-        chartContainerPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        showProjectPanel.add(chartContainerPanel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        chartContainerPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        showProjectPanel.add(chartContainerPanel, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         showPointsButton = new JButton();
         showPointsButton.setEnabled(false);
         showPointsButton.setText("Show selected points");
         showPointsButton.setVisible(false);
-        showProjectPanel.add(showPointsButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
+        showProjectPanel.add(showPointsButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, 1, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 1, false));
         saveButton = new JButton();
         saveButton.setText("Save");
-        showProjectPanel.add(saveButton, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        showProjectPanel.add(saveButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

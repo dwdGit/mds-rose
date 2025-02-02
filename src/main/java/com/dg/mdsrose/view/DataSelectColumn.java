@@ -1,6 +1,9 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.util.DataDataset;
+import com.dg.mdsrose.project.processor.DataFileProcessor;
+import com.dg.mdsrose.project.extractor.DataDatasetColumnExtractor;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
@@ -13,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class DataSelectColumn extends JFrame implements ActionListener {
+public class DataSelectColumn extends SelectColumnBaseFrame implements ActionListener {
 
     private JButton confirmButton;
     private JPanel dataSelectColumnPanel;
@@ -22,21 +25,15 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     private JButton generateRowButton;
     private JPanel rowPanel;
 
+    private static final String PREFIX_INDEX_COLUMN_INPUT_FIELD = "numberColumn";
+    private static final String PREFIX_NAME_COLUMN_INPUT_FIELD = "nameColumn";
     private final Map<Integer, String> selectedColumns = new HashMap<>();
     private final String path;
-    private final String prefixIndexColumnInputField = "numberColumn";
-    private final String prefixNameColumnInputField = "nameColumn";
     private final Integer numColumnsDataset;
     private boolean rowGenerated;
 
     public DataSelectColumn(String path) {
-        this.setTitle("Select Column");
-        this.setContentPane(dataSelectColumnPanel);
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -46,8 +43,18 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         confirmButton.addActionListener(this);
 
         this.path = path;
-        DataDataset dataDataset = new DataDataset(path);
-        numColumnsDataset = dataDataset.getNumberOfColumns();
+        DataDatasetColumnExtractor dataDatasetColumnExtractor = new DataDatasetColumnExtractor(path);
+        numColumnsDataset = dataDatasetColumnExtractor.extractColumnsMetadata();
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Data file column selection";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return dataSelectColumnPanel;
     }
 
     @Override
@@ -77,10 +84,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         String nameColumn = null;
         for (Component component : components) {
             if (component instanceof JTextField textField) {
-                if (textField.getName().startsWith(prefixIndexColumnInputField)) {
+                if (textField.getName().startsWith(PREFIX_INDEX_COLUMN_INPUT_FIELD)) {
                     numColumn = Integer.parseInt(textField.getText());
                 }
-                if (textField.getName().startsWith(prefixNameColumnInputField)) {
+                if (textField.getName().startsWith(PREFIX_NAME_COLUMN_INPUT_FIELD)) {
                     nameColumn = textField.getText();
                 }
                 if (Objects.nonNull(numColumn) && Objects.nonNull(nameColumn)) {
@@ -91,7 +98,8 @@ public class DataSelectColumn extends JFrame implements ActionListener {
             }
         }
 
-        new SelectShapeAndColor(this.path, selectedColumns);
+        partialSave(new DataFileProcessor(path, selectedColumns), selectedColumns);
+        new SelectShapeAndColor();
         this.dispose();
     }
 
@@ -137,7 +145,7 @@ public class DataSelectColumn extends JFrame implements ActionListener {
     }
 
     private boolean checkNumericField(JTextField textField) {
-        return textField.getName().startsWith(prefixIndexColumnInputField);
+        return textField.getName().startsWith(PREFIX_INDEX_COLUMN_INPUT_FIELD);
     }
 
     private boolean checkInputAreEmpty(JTextField textField) {
@@ -172,10 +180,10 @@ public class DataSelectColumn extends JFrame implements ActionListener {
         rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
-            numColField.setName(prefixIndexColumnInputField + i);
+            numColField.setName(PREFIX_INDEX_COLUMN_INPUT_FIELD + i);
             JLabel numColLabel = new JLabel(".");
             JTextField nameColField = new JTextField(0);
-            nameColField.setName(prefixNameColumnInputField + i);
+            nameColField.setName(PREFIX_NAME_COLUMN_INPUT_FIELD + i);
             rowPanel.add(numColField);
             rowPanel.add(numColLabel);
             rowPanel.add(nameColField);
@@ -214,23 +222,23 @@ public class DataSelectColumn extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         dataSelectColumnPanel = new JPanel();
-        dataSelectColumnPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 2, new Insets(10, 10, 10, 10), -1, -1));
+        dataSelectColumnPanel.setLayout(new GridLayoutManager(5, 2, new Insets(10, 10, 10, 10), -1, -1));
         confirmButton = new JButton();
         confirmButton.setText("Confirm");
-        dataSelectColumnPanel.add(confirmButton, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataSelectColumnPanel.add(confirmButton, new GridConstraints(4, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         numColumnField = new JTextField();
-        dataSelectColumnPanel.add(numColumnField, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        dataSelectColumnPanel.add(numColumnField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         columnLabel = new JLabel();
         columnLabel.setText("Define number of column to visualize.");
-        dataSelectColumnPanel.add(columnLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataSelectColumnPanel.add(columnLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         generateRowButton = new JButton();
         generateRowButton.setText("Generate");
-        dataSelectColumnPanel.add(generateRowButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataSelectColumnPanel.add(generateRowButton, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JSeparator separator1 = new JSeparator();
-        dataSelectColumnPanel.add(separator1, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(-1, 20), null, 0, false));
+        dataSelectColumnPanel.add(separator1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(-1, 20), null, 0, false));
         rowPanel = new JPanel();
-        rowPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        dataSelectColumnPanel.add(rowPanel, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        rowPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        dataSelectColumnPanel.add(rowPanel, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**

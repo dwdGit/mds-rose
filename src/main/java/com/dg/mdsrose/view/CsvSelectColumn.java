@@ -1,6 +1,9 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.util.CsvDataset;
+import com.dg.mdsrose.project.processor.CSVFileProcessor;
+import com.dg.mdsrose.project.extractor.CSVDatasetColumnExtractor;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.swing.*;
@@ -12,9 +15,8 @@ import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-public class CsvSelectColumn extends JFrame implements ActionListener {
+public class CsvSelectColumn extends SelectColumnBaseFrame implements ActionListener {
     private JPanel selectColumnPanel;
     private JList<String> columnList;
     private JButton confirmButton;
@@ -24,13 +26,7 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
     private List<Pair<Integer, String>> csvColumns;
 
     public CsvSelectColumn(String path) {
-        this.setTitle("Select Column");
-        this.setContentPane(selectColumnPanel);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 new Homepage();
@@ -43,9 +39,19 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
         confirmButton.addActionListener(this);
     }
 
+    @Override
+    protected String setTitle() {
+        return "CSV file column selection";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return selectColumnPanel;
+    }
+
     private void populateList() {
-        CsvDataset csvDataset = new CsvDataset(path);
-        Optional<List<Pair<Integer, String>>> optionalCsvColumns = csvDataset.getColumns();
+        CSVDatasetColumnExtractor csvDatasetColumnExtractor = new CSVDatasetColumnExtractor(path);
+        List<Pair<Integer, String>> optionalCsvColumns = csvDatasetColumnExtractor.extractColumnsMetadata();
         if (optionalCsvColumns.isEmpty()) {
             JOptionPane.showMessageDialog(
                 this,
@@ -56,14 +62,14 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
             return;
         }
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        csvColumns = optionalCsvColumns.get();
+        csvColumns = optionalCsvColumns;
         csvColumns.forEach(pair -> listModel.addElement(pair.getRight()));
         columnList.setModel(listModel);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == confirmButton) {
+        if (e.getSource().equals(confirmButton)) {
             confirmColumns();
         }
     }
@@ -84,7 +90,8 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
                 selectedColumns.put(pair.getLeft() + 1, pair.getRight());
             }
         });
-        new SelectShapeAndColor(this.path, selectedColumns);
+        partialSave(new CSVFileProcessor(path, selectedColumns), selectedColumns);
+        new SelectShapeAndColor();
         this.dispose();
     }
 
@@ -108,12 +115,12 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         selectColumnPanel = new JPanel();
-        selectColumnPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
+        selectColumnPanel.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         columnList = new JList();
-        selectColumnPanel.add(columnList, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        selectColumnPanel.add(columnList, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
         confirmButton = new JButton();
         confirmButton.setText("Confirm");
-        selectColumnPanel.add(confirmButton, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        selectColumnPanel.add(confirmButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
@@ -122,10 +129,5 @@ public class CsvSelectColumn extends JFrame implements ActionListener {
     public JComponent $$$getRootComponent$$$() {
         return selectColumnPanel;
     }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
-
 
 }

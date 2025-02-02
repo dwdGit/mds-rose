@@ -1,6 +1,6 @@
 package com.dg.mdsrose.view;
 
-import com.dg.mdsrose.exception.UserAlreadyExistsException;
+import com.dg.mdsrose.user.exception.UserAlreadyExistsException;
 import com.dg.mdsrose.user.UserService;
 
 import javax.swing.*;
@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Signup extends JFrame implements ActionListener {
+public class Signup extends BaseJFrame implements ActionListener {
     private JPanel signupPanel;
     private JTextField firstnameField;
     private JTextField lastnameField;
@@ -25,14 +25,28 @@ public class Signup extends JFrame implements ActionListener {
     private final UserService userService = UserService.getInstance();
 
     public Signup() {
-        this.setTitle("Signup");
-        this.setContentPane(signupPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createAndShowGUI();
         this.signUpButton.addActionListener(this);
+    }
+
+    @Override
+    protected String setTitle() {
+        return "Signup";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return signupPanel;
+    }
+
+    @Override
+    protected int setDefaultCloseOperation() {
+        return WindowConstants.EXIT_ON_CLOSE;
+    }
+
+    @Override
+    protected Dimension setPreferredSize() {
+        return null;
     }
 
     @Override

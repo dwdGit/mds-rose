@@ -2,10 +2,7 @@ package com.dg.mdsrose.project;
 
 import com.dg.mdsrose.project.model.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryProjectDAO implements ProjectDAO {
@@ -39,7 +36,7 @@ public class InMemoryProjectDAO implements ProjectDAO {
     }
 
     @Override
-    public Long insertDatasetFeatures(DatasetFeature datasetFeature) {
+    public Long insertDatasetFeature(DatasetFeature datasetFeature) {
         long id = datasetFeaturesSequence.getAndIncrement();
         datasetFeature.setId(id);
         datasetFeatures.put(id, datasetFeature);
@@ -55,11 +52,9 @@ public class InMemoryProjectDAO implements ProjectDAO {
     }
 
     @Override
-    public Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow) {
+    public void insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow) {
         long id = datasetFeatureRowsSequence.getAndIncrement();
-        datasetFeatureRow.setId(id);
         datasetFeatureRows.put(id, datasetFeatureRow);
-        return id;
     }
 
     @Override
@@ -123,5 +118,59 @@ public class InMemoryProjectDAO implements ProjectDAO {
                 .stream()
                 .filter(project -> project.getUserId().equals(id))
                 .toList();
+    }
+
+    @Override
+    public boolean projectExistsByName(String name) {
+        return projects.values()
+            .stream()
+            .anyMatch(project -> project.getName().equals(name));
+    }
+
+    @Override
+    public List<DatasetClass> findAllDatasetClasses() {
+        return datasetClasses.values()
+            .stream()
+            .toList();
+    }
+
+    @Override
+    public void updateDatasetClass(DatasetClass datasetClass) {
+        Optional<DatasetClass> storedDatasetClass = findDatasetClassById(datasetClass.getId());
+
+        storedDatasetClass.ifPresent(dc -> {
+            dc.setName(datasetClass.getName());
+            dc.setMarker(datasetClass.getMarker());
+            dc.setColor(datasetClass.getColor());
+            dc.setProjectId(datasetClass.getProjectId());
+            datasetClasses.put(dc.getId(), dc);
+        });
+    }
+
+    @Override
+    public List<DatasetRow> findAllDatasetRows() {
+        return datasetRows.values()
+            .stream()
+            .toList();
+    }
+
+    @Override
+    public List<DatasetFeature> findAllDatasetFeatures() {
+        return datasetFeatures.values()
+            .stream()
+            .toList();
+    }
+
+    @Override
+    public void bulkInsertDatasetFeatureRows(List<DatasetFeatureRow> datasetFeatureRows) {
+        datasetFeatureRows.forEach(this::insertDatasetFeatureRow);
+    }
+
+    @Override
+    public void clearTables() {
+        datasetClasses.clear();
+        datasetFeatures.clear();
+        datasetRows.clear();
+        datasetFeatureRows.clear();
     }
 }

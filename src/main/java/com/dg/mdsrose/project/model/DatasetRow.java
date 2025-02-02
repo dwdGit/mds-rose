@@ -11,6 +11,12 @@ public class DatasetRow {
 
     public DatasetRow() {}
 
+    public DatasetRow(Long classId, double x, double y) {
+        this.classId = classId;
+        this.x = x;
+        this.y = y;
+    }
+
     public DatasetRow(Long classId, double x, double y, Long projectId) {
         this.classId = classId;
         this.x = x;

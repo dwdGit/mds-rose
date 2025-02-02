@@ -6,6 +6,8 @@ import com.dg.mdsrose.project.ProjectService;
 import com.dg.mdsrose.project.model.Project;
 import com.dg.mdsrose.user.UserSession;
 import com.dg.mdsrose.view.renderer.ProjectRenderer;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,32 +16,40 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Objects;
 
-public class Homepage extends JFrame implements ActionListener {
+public class Homepage extends BaseJFrame implements ActionListener {
     private JLabel yourProjectsLabel;
     private JPanel homepagePanel;
     private JButton newProjectButton;
     private JList<Project> projectList;
     private JButton openProjectButton;
 
-    public Homepage() {
-        this.setTitle("Homepage");
-        this.setContentPane(homepagePanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setPreferredSize(new Dimension(800, 640));
-        this.pack();
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+    private final UserSession userSession = UserSession.getInstance();
 
+    public Homepage() {
+        createAndShowGUI();
         getProjects();
         newProjectButton.addActionListener(this);
         openProjectButton.addActionListener(this);
     }
 
+    @Override
+    protected String setTitle() {
+        return "Homepage";
+    }
+
+    @Override
+    protected JPanel setContentPanel() {
+        return homepagePanel;
+    }
+
+    @Override
+    protected int setDefaultCloseOperation() {
+        return WindowConstants.EXIT_ON_CLOSE;
+    }
+
     private void getProjects() {
-        UserSession instance = UserSession.getInstance();
-        DBProjectDAO dao = new DBProjectDAO();
-        ProjectService projectService = new ProjectService(dao);
-        List<Project> projects = projectService.findProjectByUserId(instance.getUserId());
+        ProjectService projectService = new ProjectService(new DBProjectDAO());
+        List<Project> projects = projectService.findProjectByUserId(userSession.getUserId());
         projectList.setListData(projects.toArray(new Project[0]));
         projectList.setCellRenderer(new ProjectRenderer());
     }
@@ -54,12 +64,13 @@ public class Homepage extends JFrame implements ActionListener {
     }
 
     private void openProject() {
-        Project selectedProject = (Project) projectList.getSelectedValue();
+        Project selectedProject = projectList.getSelectedValue();
         if (Objects.isNull(selectedProject)) {
-            //todo error select project
+            JOptionPane.showMessageDialog(null, "No project selected!", "Project Selection", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        ProjectService projectService = new DBProjectService().createProjectService();
-        new ShowProject(projectService, selectedProject.getId(), false);
+        ProjectService projectService = DBProjectService.getInstance();
+        new ShowProject(projectService, selectedProject.getId());
         this.dispose();
     }
 
@@ -84,22 +95,22 @@ public class Homepage extends JFrame implements ActionListener {
      */
     private void $$$setupUI$$$() {
         homepagePanel = new JPanel();
-        homepagePanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
+        homepagePanel.setLayout(new GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
         yourProjectsLabel = new JLabel();
         yourProjectsLabel.setText("Your projects");
-        homepagePanel.add(yourProjectsLabel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        homepagePanel.add(yourProjectsLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         newProjectButton = new JButton();
         newProjectButton.setText("New project");
-        homepagePanel.add(newProjectButton, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        homepagePanel.add(newProjectButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         projectList = new JList();
         projectList.setEnabled(true);
         projectList.setVisible(true);
-        homepagePanel.add(projectList, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        homepagePanel.add(projectList, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
         openProjectButton = new JButton();
         openProjectButton.setEnabled(true);
         openProjectButton.setText("Open Project");
         openProjectButton.setVisible(true);
-        homepagePanel.add(openProjectButton, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        homepagePanel.add(openProjectButton, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

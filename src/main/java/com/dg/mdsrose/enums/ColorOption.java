@@ -25,12 +25,21 @@ public enum ColorOption {
         return color;
     }
 
-    public static ColorOption from(String colorValue) {
+    public static ColorOption from(String value) {
         for (ColorOption color : ColorOption.values()) {
-            if (color.getValue().equals(colorValue)) {
+            if (color.getValue().equals(value)) {
                 return color;
             }
         }
         return null;
+    }
+
+    public static String[] comboBoxOptions() {
+        String[] options = new String[ColorOption.values().length];
+        ColorOption[] values = ColorOption.values();
+        for(int i = 0; i < values.length; i++) {
+            options[i] = values[i].getValue();
+        }
+        return options;
     }
 }

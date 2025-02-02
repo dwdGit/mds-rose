@@ -3,7 +3,6 @@ package com.dg.mdsrose.project.model;
 import java.util.Objects;
 
 public class DatasetFeatureRow {
-    private Long id;
     private Long featureId;
     private Long rowId;
     private double value;
@@ -14,21 +13,6 @@ public class DatasetFeatureRow {
         this.featureId = featureId;
         this.rowId = rowId;
         this.value = value;
-    }
-
-    public DatasetFeatureRow(Long id, Long featureId, Long rowId, double value) {
-        this.id = id;
-        this.featureId = featureId;
-        this.rowId = rowId;
-        this.value = value;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getFeatureId() {
@@ -58,8 +42,7 @@ public class DatasetFeatureRow {
     @Override
     public String toString() {
         return "DatasetFeatureRow{" +
-            "id=" + id +
-            ", featureId=" + featureId +
+            "featureId=" + featureId +
             ", rowId=" + rowId +
             ", value=" + value +
             '}';
@@ -69,11 +52,11 @@ public class DatasetFeatureRow {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         DatasetFeatureRow that = (DatasetFeatureRow) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(featureId, that.getFeatureId()) && Objects.equals(rowId, that.getRowId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(featureId, rowId);
     }
 }
