@@ -227,7 +227,7 @@ public class ShowProject extends BaseJFrame implements ActionListener {
             .map(DatasetRow::getId)
             .toList();
         List<DatasetFeatureRow> datasetFeatureRows = projectService.findDatasetFeatureRowsByRowIds(listDatasetRowIds);
-        dbProjectService.partialSave(
+        dbProjectService.save(
             datasetClassesByProjectId,
             datasetFeaturesByProjectId,
             datasetRowsByProjectId,
