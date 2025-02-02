@@ -53,13 +53,6 @@ public class ProjectService {
         });
     }
 
-    public void insertDatasetFeatures(Map<Integer, String> features) {
-        features.values().forEach(name -> {
-            DatasetFeature datasetFeature = new DatasetFeature(name);
-            projectDAO.insertDatasetFeature(datasetFeature);
-        });
-    }
-
     public List<DatasetClass> findDatasetClassesByProjectId(Long projectId) {
         return projectDAO.findDatasetClassesByProjectId(projectId);
     }
@@ -78,10 +71,6 @@ public class ProjectService {
 
     public Optional<DatasetClass> findDatasetClassById(Long id) {
         return projectDAO.findDatasetClassById(id);
-    }
-
-    public Optional<Project> findProject(Long id) {
-        return projectDAO.findProject(id);
     }
 
     public List<Project> findProjectByUserId(Long id) {
