@@ -14,7 +14,7 @@ public interface ProjectDAO {
 
     Long insertDatasetRow(DatasetRow datasetRow);
 
-    Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow);
+    void insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow);
 
     Optional<DatasetClass> findDatasetClassById(Long id);
 

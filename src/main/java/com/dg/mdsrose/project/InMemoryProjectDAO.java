@@ -52,11 +52,9 @@ public class InMemoryProjectDAO implements ProjectDAO {
     }
 
     @Override
-    public Long insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow) {
+    public void insertDatasetFeatureRow(DatasetFeatureRow datasetFeatureRow) {
         long id = datasetFeatureRowsSequence.getAndIncrement();
-        datasetFeatureRow.setId(id);
         datasetFeatureRows.put(id, datasetFeatureRow);
-        return id;
     }
 
     @Override
@@ -165,7 +163,7 @@ public class InMemoryProjectDAO implements ProjectDAO {
 
     @Override
     public void bulkInsertDatasetFeatureRows(List<DatasetFeatureRow> datasetFeatureRows) {
-
+        datasetFeatureRows.forEach(this::insertDatasetFeatureRow);
     }
 
     @Override
