@@ -180,12 +180,12 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
+            numColField.setToolTipText("Insert column number");
             numColField.setName(PREFIX_INDEX_COLUMN_INPUT_FIELD + i);
-            JLabel numColLabel = new JLabel(".");
             JTextField nameColField = new JTextField(0);
+            nameColField.setToolTipText("Insert column label");
             nameColField.setName(PREFIX_NAME_COLUMN_INPUT_FIELD + i);
             rowPanel.add(numColField);
-            rowPanel.add(numColLabel);
             rowPanel.add(nameColField);
         }
         rowPanel.revalidate();
@@ -222,10 +222,10 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
      */
     private void $$$setupUI$$$() {
         dataSelectColumnPanel = new JPanel();
-        dataSelectColumnPanel.setLayout(new GridLayoutManager(5, 2, new Insets(10, 10, 10, 10), -1, -1));
+        dataSelectColumnPanel.setLayout(new GridLayoutManager(4, 2, new Insets(10, 10, 10, 10), -1, -1));
         confirmButton = new JButton();
         confirmButton.setText("Confirm");
-        dataSelectColumnPanel.add(confirmButton, new GridConstraints(4, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        dataSelectColumnPanel.add(confirmButton, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         numColumnField = new JTextField();
         dataSelectColumnPanel.add(numColumnField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         columnLabel = new JLabel();
@@ -234,11 +234,9 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         generateRowButton = new JButton();
         generateRowButton.setText("Generate");
         dataSelectColumnPanel.add(generateRowButton, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JSeparator separator1 = new JSeparator();
-        dataSelectColumnPanel.add(separator1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(-1, 20), null, 0, false));
         rowPanel = new JPanel();
         rowPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        dataSelectColumnPanel.add(rowPanel, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        dataSelectColumnPanel.add(rowPanel, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     }
 
     /**
