@@ -48,6 +48,11 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
     }
 
     @Override
+    protected Dimension setPreferredSize() {
+        return null;
+    }
+
+    @Override
     protected String setTitle() {
         return "Data file column selection";
     }
@@ -67,7 +72,8 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
     }
 
     private void confirmRow() {
-        checkInputField();
+        if(!checkInputField())
+            return;
         if (!rowGenerated) {
             JOptionPane.showMessageDialog(
                 this,
@@ -103,7 +109,7 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         this.dispose();
     }
 
-    private void checkInputField() {
+    private boolean checkInputField() {
         Component[] components = rowPanel.getComponents();
         for (Component component : components) {
             if (component instanceof JTextField textField) {
@@ -114,7 +120,7 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
                         "Error",
                         JOptionPane.ERROR_MESSAGE
                     );
-                    return;
+                    return false;
                 }
                 if (checkNumericField(textField)) {
                     if (!checkDigitInputFieldNumericColumn(textField)) {
@@ -124,7 +130,7 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
                             "Error",
                             JOptionPane.ERROR_MESSAGE
                         );
-                        return;
+                        return false;
                     }
                     if (checkInputFieldMaxColumn(textField)) {
                         JOptionPane.showMessageDialog(
@@ -133,15 +139,29 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
                             "Error",
                             JOptionPane.ERROR_MESSAGE
                         );
-                        return;
+                        return false;
+                    }
+                    if(checkInputValueZero(textField)){
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "Column numbers start from 1.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return false;
                     }
                 }
             }
         }
+        return true;
+    }
+
+    private boolean checkInputValueZero(JTextField textField) {
+        return textField.getText().equals("0");
     }
 
     private boolean checkInputFieldMaxColumn(JTextField textField) {
-        return Integer.parseInt(textField.getText()) > numColumnsDataset;
+        return Integer.parseInt(textField.getText()) > numColumnsDataset-1;
     }
 
     private boolean checkNumericField(JTextField textField) {
@@ -177,7 +197,13 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         }
         this.rowGenerated = true;
         rowPanel.removeAll();
-        rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText()), 0));
+        rowPanel.setLayout(new GridLayout(Integer.parseInt(numColumnField.getText())+1, 0));
+        JLabel numColumnLabel = new JLabel();
+        numColumnLabel.setText("Number Column");
+        JLabel nameColumnLabel = new JLabel();
+        nameColumnLabel.setText("Name Column");
+        rowPanel.add(numColumnLabel);
+        rowPanel.add(nameColumnLabel);
         for (int i = 0; i < Integer.parseInt(numColumnField.getText()); i++) {
             JTextField numColField = new JTextField(0);
             numColField.setToolTipText("Insert column number");
@@ -190,6 +216,7 @@ public class DataSelectColumn extends SelectColumnBaseFrame implements ActionLis
         }
         rowPanel.revalidate();
         rowPanel.repaint();
+        this.pack();
     }
 
     private boolean checkMaxNumColumn() {
