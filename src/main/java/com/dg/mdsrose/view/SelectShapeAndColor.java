@@ -101,12 +101,13 @@ public class SelectShapeAndColor extends BaseJFrame implements ActionListener {
 
         List<SelectedShape> selectedShapes = getSelectedShapes();
         List<Shape> shapes = selectedShapes.stream()
-            .map(selectedShape ->
-                ConcreteShapeBuilder.of(
-                    selectedShape.getLabel(),
-                    ColorOption.from(selectedShape.getColor()),
-                    MarkerOption.from(selectedShape.getMarker())
-                )
+            .map(selectedShape -> {
+                    ConcreteShapeBuilder concreteShapeBuilder = new ConcreteShapeBuilder();
+                    concreteShapeBuilder.setLabel(selectedShape.getLabel());
+                    concreteShapeBuilder.setColor(ColorOption.from(selectedShape.getColor()));
+                    concreteShapeBuilder.setMarker(MarkerOption.from(selectedShape.getMarker()));
+                    return concreteShapeBuilder;
+                }
             )
             .map(ConcreteShapeBuilder::getResult)
             .toList();
