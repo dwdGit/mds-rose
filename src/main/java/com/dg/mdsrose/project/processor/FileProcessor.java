@@ -70,7 +70,6 @@ public abstract class FileProcessor {
     }
 
     public double[][] calculateDissimilarityMatrix(List<PartialDatasetRow> partialDatasetRows) {
-        // TODO: get it from previous step to not iterate twice the dataset
         double[][] dataset = new double[partialDatasetRows.size()][];
         for(int i = 0; i< partialDatasetRows.size(); i++) {
             dataset[i] = partialDatasetRows.get(i).data();
