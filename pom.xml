@@ -4,7 +4,7 @@
   <groupId>com.dg.mdsrose</groupId>
   <artifactId>mds-rose</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>mds-rose</name>
 
   <properties>
@@ -79,6 +79,14 @@
         <configuration>
           <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
         </configuration>
+        <executions>
+          <execution>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>update</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
